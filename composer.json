@@ -1,0 +1,44 @@
+{
+    "name": "rayamedia/yima-widgetizer",
+    "description": "Widgetize Pages By Default It Comes With Drag&Drop Solution.",
+    "keywords": [
+        "theme",
+        "template",
+        "layout",
+        "widgets",
+        "site builder",
+        "ui",
+        "zf2 module",
+        "zf2",
+        "yima",
+        "raya media"
+    ],
+    "authors": [
+        {
+            "name": "Payam Naderi",
+            "email": "naderi.payam@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "rayamedia/yima-theme": "dev-master",
+        "rayamedia/yima-widgetator": "dev-master"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "Widgetizer\\" : "src/"
+        },
+        "classmap" : [
+            "./Module.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.raya-media.com/"
+        }
+    ]
+}
