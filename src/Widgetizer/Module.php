@@ -6,7 +6,6 @@ use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
-use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
 
@@ -17,7 +16,6 @@ use Zend\Mvc\MvcEvent;
 class Module implements
     InitProviderInterface,
     BootstrapListenerInterface,
-    ServiceProviderInterface,
     AutoloaderProviderInterface
 {
     /**
@@ -72,19 +70,6 @@ class Module implements
             ->getEventManager()
             ->attach($listenerAggr)
         ;
-    }
-
-    /**
-     * Expected to return \Zend\ServiceManager\Config object or array to
-     * seed such an object.
-     *
-     * @return array|\Zend\ServiceManager\Config
-     */
-    public function getServiceConfig()
-    {
-        return array(
-
-        );
     }
 
     /**

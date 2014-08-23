@@ -14,11 +14,6 @@ class WidgetModel extends AbstractEventModel
     TableGatewayProviderInterface
 {
     /**
-     * @var string Locale Language
-     */
-    protected $language;
-
-    /**
      * @var  UserTable Gateway
      */
     protected $tableGateway;
@@ -84,6 +79,7 @@ class WidgetModel extends AbstractEventModel
      *
      * @param WidgetEntity $widgetEntity
      *
+     * @throws \Exception
      * @return mixed
      */
     public function update(WidgetEntity $widgetEntity)
@@ -108,6 +104,7 @@ class WidgetModel extends AbstractEventModel
      *
      * @param WidgetEntity $widgetEntity
      *
+     * @throws \Exception
      * @return mixed
      */
     public function delete(WidgetEntity $widgetEntity)
@@ -125,19 +122,5 @@ class WidgetModel extends AbstractEventModel
         }
 
         $this->getTableGateway()->delete($where);
-    }
-
-    // -- implemented LocaleAwareInterface ----------------------------------------------------------------------------
-
-    /**
-     * Set Locale
-     *
-     * @param $locale
-     *
-     * @return static
-     */
-    public function setLocale($locale)
-    {
-        $this->language = (string) $locale;
     }
 }

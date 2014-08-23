@@ -2,11 +2,8 @@
 namespace Widgetator\Model\Interfaces;
 
 use Widgetator\Model\WidgetEntity;
-use yimaLocali\LocaleAwareInterface;
 
 interface WidgetModelInterface
-    extends
-    LocaleAwareInterface // also locale injected by SM Initializer
 {
     /**
      * Get Widget Entity By ID
