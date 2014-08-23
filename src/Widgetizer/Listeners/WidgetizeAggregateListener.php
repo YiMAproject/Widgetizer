@@ -36,6 +36,7 @@ class WidgetizeAggregateListener implements ListenerAggregateInterface
      * Insert Defined Widgets into Layout Sections(area)
      *
      * @param MvcEvent $e MVC Event
+     * @return bool
      * @throws \Exception
      */
     public function onRenderWidgetator(MvcEvent $e)
