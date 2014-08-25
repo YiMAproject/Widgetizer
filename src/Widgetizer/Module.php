@@ -7,6 +7,7 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
@@ -18,6 +19,7 @@ use Zend\ServiceManager\ServiceManager;
  */
 class Module implements
     InitProviderInterface,
+    ServiceProviderInterface,
     BootstrapListenerInterface,
     ConfigProviderInterface,
     AutoloaderProviderInterface
@@ -58,6 +60,21 @@ class Module implements
         // this model service set with method with share by default as false value
         // on init module
         $sm->setInvokableClass('Widgetizer.Model.Widget', 'Widgetizer\Model\WidgetModel', false);
+    }
+
+    /**
+     * Expected to return \Zend\ServiceManager\Config object or array to
+     * seed such an object.
+     *
+     * @return array|\Zend\ServiceManager\Config
+     */
+    public function getServiceConfig()
+    {
+        return array(
+            'invokables' => array(
+                'Widgetizer.Model.ContainerWidgets'   => 'Widgetizer\Model\ContainerWidgetsModel',
+            ),
+        );
     }
 
     /**
