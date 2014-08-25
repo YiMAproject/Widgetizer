@@ -24,7 +24,8 @@
     },
     "require-dev": {
         "rayamedia/yima-theme": "dev-master",
-        "rayamedia/yima-widgetator": "dev-master"
+        "rayamedia/yima-widgetator": "dev-master",
+        "rayamedia/yima-base": "dev-master"
     },
     "autoload" : {
         "psr-0" : {
