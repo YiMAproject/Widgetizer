@@ -1,15 +1,15 @@
 <?php
-namespace Widgetator\Model\TableGateway;
+namespace Widgetizer\Model\TableGateway;
 
 use Poirot\Dataset;
 use yimaBase\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\ResultSet\ResultSet;
-use Widgetator\Model\WidgetEntity;
+use Widgetizer\Model\WidgetEntity;
 
 class WidgetTable extends AbstractTableGateway
 {
 	# db table name
-    protected $table = 'widgetator_widgets';
+    protected $table = 'widgetizer_widgets';
 
 	// this way you speed up running by avoiding metadata call to reach primary key
 	// exp. usage in Translation Feature
@@ -36,7 +36,7 @@ class WidgetTable extends AbstractTableGateway
 
     /**
      * Post Initialize Table
-     *
+     * - add WidgetEntity as Row Result Prototype
      */
     public function postInit()
     {

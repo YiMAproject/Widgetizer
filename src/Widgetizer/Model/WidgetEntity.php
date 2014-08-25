@@ -1,14 +1,24 @@
 <?php
-namespace Widgetator\Model;
+namespace Widgetizer\Model;
 
 class WidgetEntity extends \Poirot\Dataset\Entity
 {
-    const WIDGET_ID  = 'widget_id';
-    const UID        = 'uid';
+    const WIDGET_ID  = 'widget_id';  // Entity Storage ID
+    const WIDGET     = 'widget';     // Widget Name
+    const UID        = 'uid';        // Unique Application ID for widget
 
+    /**
+     * note: Other entities filled from dms feature
+     *
+     * @var array
+     */
     protected $properties = array(
-        self::WIDGET_ID => null,      /* Widget Identity */
-        self::UID       => null,      /* Widget App. Uniqe ID */
+        self::WIDGET_ID => null,
+        self::WIDGET    => null,
+        self::UID       => null,
+
+        // etc. Dms Feature
+        // ...
     );
 
     /**
@@ -16,7 +26,7 @@ class WidgetEntity extends \Poirot\Dataset\Entity
      *
      * @var bool Strict Mode
      */
-    // protected $strictMode = true;
+     # protected $strictMode = true;
 
     /**
      * Implement Entity as ResultSet

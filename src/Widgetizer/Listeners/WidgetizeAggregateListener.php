@@ -3,19 +3,29 @@ namespace Widgetizer\Listeners;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
+use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\View\Model\ViewModel;
 
 /**
  * Class WidgetizeAggregateListener
  * @package Widgetizer\Listeners
  */
-class WidgetizeAggregateListener implements ListenerAggregateInterface
+class WidgetizeAggregateListener implements
+    ServiceManagerAwareInterface,
+    ListenerAggregateInterface
 {
     /**
      * @var \Zend\Stdlib\CallbackHandler[]
      */
     protected $listeners = array();
+
+    /**
+     * @var ServiceManager
+     */
+    protected $sm;
 
     /**
      * Attach one or more listeners
@@ -29,57 +39,29 @@ class WidgetizeAggregateListener implements ListenerAggregateInterface
      */
     public function attach(EventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetator'), -9000);
+        $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetizer'), -9000);
     }
 
     /**
      * Insert Defined Widgets into Layout Sections(area)
      *
      * @param MvcEvent $e MVC Event
-     * @return bool
+     *
      * @throws \Exception
      */
-    public function onRenderWidgetator(MvcEvent $e)
+    public function onRenderWidgetizer(MvcEvent $e)
     {
         $result = $e->getResult();
         if ($result instanceof Response) {
-            return;
+            return false;
         }
 
         $viewModel = $e->getViewModel();
         if (! $viewModel instanceof ViewModel) {
-            return;
+            return false;
         }
 
-        return false;
-
-        // load widgets into {
-        $themeObject  = $this->manager->getThemeObject();
-        if (!$themeObject) {
-            // we are not attained theme
-            return;
-        }
-
-        $sm = $this->sm;
-
-        /*
-         * [
-         *  'layout_name' =>
-         *      [
-         *          'area' => [
-         *              toStringObject,
-         *              ViewModel,
-         *          ]
-         *      ]
-         * ]
-         */
-        $widgetsContainer = array();
-        do {
-            // get merged widgets of child themes
-            $widgetsContainer = ArrayUtils::merge($widgetsContainer, (array) $themeObject->getParam('widgets'));
-        } while($themeObject = $themeObject->getChild());
-
-        $layout           = $viewModel->getTemplate();
+        /*$layout           = $viewModel->getTemplate();
         $areas            = isset($widgetsContainer[$layout]) ? $widgetsContainer[$layout] : array();
         foreach($areas as $area => $widgets)
         {
@@ -110,7 +92,7 @@ class WidgetizeAggregateListener implements ListenerAggregateInterface
                 elseif (! $w instanceof ViewModel)
                     throw new \Exception('Invalid Widget Provided, Widget "'.gettype($w).'"');
             }
-        }
+        }*/
     }
 
     /**
@@ -126,5 +108,15 @@ class WidgetizeAggregateListener implements ListenerAggregateInterface
                 unset($this->listeners[$index]);
             }
         }
+    }
+
+    /**
+     * Set service manager
+     *
+     * @param ServiceManager $serviceManager
+     */
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->sm = $serviceManager;
     }
 }

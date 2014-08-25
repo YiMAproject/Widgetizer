@@ -1,7 +1,7 @@
 <?php
-namespace Widgetator\Model\Interfaces;
+namespace Widgetizer\Model\Interfaces;
 
-use Widgetator\Model\WidgetEntity;
+use Widgetizer\Model\WidgetEntity;
 
 interface WidgetModelInterface
 {

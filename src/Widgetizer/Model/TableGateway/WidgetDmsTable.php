@@ -1,5 +1,5 @@
 <?php
-namespace Widgetator\Model\TableGateway;
+namespace Widgetizer\Model\TableGateway;
 
 use yimaBase\Db\TableGateway\AbstractTableGateway;
 
@@ -10,5 +10,5 @@ use yimaBase\Db\TableGateway\AbstractTableGateway;
 class WidgetDmsTable extends AbstractTableGateway
 {
     # db table name
-    protected $table = 'widgetator_widgets_dms';
+    protected $table = 'Widgetizer_widgets_dms';
 }

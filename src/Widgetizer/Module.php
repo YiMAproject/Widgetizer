@@ -9,6 +9,7 @@ use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Class Module
@@ -65,7 +66,11 @@ class Module implements
      */
     public function onBootstrap(EventInterface $e)
     {
+        $sm = $e->getApplication()
+            ->getServiceManager();
+
         $listenerAggr = new WidgetizeAggregateListener();
+        $listenerAggr->setServiceManager($sm);
 
         $e->getApplication()
             ->getEventManager()

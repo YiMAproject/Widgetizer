@@ -1,12 +1,11 @@
 <?php
-namespace Widgetator\Model;
+namespace Widgetizer\Model;
 
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
 use Zend\ServiceManager\ServiceManager;
-use Widgetator\Model\Interfaces\WidgetModelInterface;
-use Widgetator\Model\TableGateway\UserTable;
-use Widgetator\Model\TableGateway\WidgetTable;
+use Widgetizer\Model\Interfaces\WidgetModelInterface;
+use Widgetizer\Model\TableGateway\WidgetTable;
 
 class WidgetModel extends AbstractEventModel
     implements
@@ -14,7 +13,7 @@ class WidgetModel extends AbstractEventModel
     TableGatewayProviderInterface
 {
     /**
-     * @var  UserTable Gateway
+     * @var  WidgetTable Gateway
      */
     protected $tableGateway;
 
@@ -26,7 +25,7 @@ class WidgetModel extends AbstractEventModel
     /**
      * Get TableGateway
      *
-     * @return UserTable|WidgetTable
+     * @return WidgetTable
      */
     public function getTableGateway()
     {
