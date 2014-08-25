@@ -1,6 +1,13 @@
 <?php
 namespace Widgetizer\Listeners;
 
+use Widgetizer\Model\ContainerWidgetsEntity as CWE;
+use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
+use Widgetizer\Model\Interfaces\WidgetModelInterface;
+use Widgetizer\Model\WidgetEntity;
+use yimaTheme\Theme\ThemeDefaultInterface;
+use yimaWidgetator\Service\WidgetManager;
+use yimaWidgetator\Widget\Interfaces\WidgetInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Http\PhpEnvironment\Response;
@@ -57,42 +64,55 @@ class WidgetizeAggregateListener implements
         }
 
         $viewModel = $e->getViewModel();
-        if (! $viewModel instanceof ViewModel) {
+        if (! $viewModel instanceof ThemeDefaultInterface) {
             return false;
         }
 
-        /*$layout           = $viewModel->getTemplate();
-        $areas            = isset($widgetsContainer[$layout]) ? $widgetsContainer[$layout] : array();
-        foreach($areas as $area => $widgets)
-        {
-            if (! is_array($widgets) ) {
-                // convert it to array for itterate over
-                $widgets = array($widgets);
-            }
+        // Get widgets loaded into each area by template and layout ... {
+        /** @var $cntModel ContainerWidgetsModelInterface */
+        $cntModel = $this->sm->get('Widgetizer.Model.ContainerWidgets');
 
-            foreach ($widgets as $w) {
-                if (is_string($w)) {
-                    if ($sm->has($w))
-                        $w = $sm->get($w);
-                    elseif (class_exists($w))
-                        $w = new $w();
-                }
+        $criteria = new CWE(array(
+            CWE::TEMPLATE        => $viewModel->getName(),
+            CWE::TEMPLATE_LAYOUT => $viewModel->getTemplate(),
+        ));
+        $result = $cntModel->find($criteria);
+        foreach ($result as $r) {
+            // Render Widget
+            $this->renderWidget($r, $viewModel);
+        }
+        // ... }
+    }
 
-                if (is_object($w)) {
-                    if ($w instanceof ViewModel)
-                        $viewModel->addChild($w, $area, true);
-                    elseif (method_exists($w, '__toString'))
-                        $w = (string) $w;
-                    else
-                        throw new \Exception('Invalid Widget Provided, Widget "'.get_class($w).'" is not toString implemented or ViewModel instance.');
-                }
+    /**
+     * Render Widget From Container Result
+     *
+     * @param CWE $r
+     */
+    protected function renderWidget(CWE $r, ViewModel $viewModel)
+    {
+        /** @var $widgetManager WidgetManager */
+        $widgetManager = $this->sm->get('yimaWidgetator.WidgetManager');
 
-                if (is_string($w))
-                    $viewModel->{$area} .= $w;
-                elseif (! $w instanceof ViewModel)
-                    throw new \Exception('Invalid Widget Provided, Widget "'.gettype($w).'"');
-            }
-        }*/
+        /** @var $widgetModel WidgetModelInterface */
+        $widgetModel = $this->sm->get('Widgetizer.Model.Widget');
+        /** @var $w WidgetEntity */
+        $w = $widgetModel->getWidgetByUid( $r->get(CWE::WIDGET_UID) );
+        if (!$w || !$widgetManager->has($w->get(WidgetEntity::WIDGET))) {
+            // we don't have a widget with this name registered.
+            // ...
+            return false;
+        }
+
+        // get widget from widgetManager by Widget Name Field
+        /** @var $widget WidgetInterface */
+        $widget = $widgetManager->get($w->get(WidgetEntity::WIDGET));
+        if (method_exists($widget, 'setFromArray')) {
+            // load prop. entities into widget
+            $widget->setFromArray($w->getArrayCopy());
+        }
+        $template_area = $r->get(CWE::TEMPLATE_AREA);
+        $viewModel->{$template_area} .= $widget->render();
     }
 
     /**

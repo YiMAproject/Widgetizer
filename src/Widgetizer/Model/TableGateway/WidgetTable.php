@@ -35,7 +35,7 @@ class WidgetTable extends AbstractTableGateway
         $this->columns      = array_keys($entityObject->getArrayCopy());
 
         // put this on last, reason is on pre(Action) manipulate columns raw dataSet
-        $feature = new DmsFeature($this->columns);
+        $feature = new DmsFeature(array(), new WidgetDmsTable());
         $this->featureSet->addFeature($feature);
         $this->featureSet->setTableGateway($this);
     }

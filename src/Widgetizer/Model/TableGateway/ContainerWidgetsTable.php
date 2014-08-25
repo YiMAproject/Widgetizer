@@ -2,6 +2,7 @@
 namespace Widgetizer\Model\TableGateway;
 
 use Poirot\Dataset;
+use Widgetizer\Model\ContainerWidgetsEntity;
 use yimaBase\Db\TableGateway\AbstractTableGateway;
 use yimaBase\Db\TableGateway\Feature\DmsFeature;
 use Zend\Db\ResultSet\ResultSet;
@@ -10,14 +11,14 @@ use Widgetizer\Model\WidgetEntity;
 class ContainerWidgetsTable extends AbstractTableGateway
 {
 	# db table name
-    protected $table = 'widgetizer_widgets';
+    protected $table = 'widgetizer_container_widgets';
 
 	// this way you speed up running by avoiding metadata call to reach primary key
 	// exp. usage in Translation Feature
-	protected $primaryKey = WidgetEntity::WIDGET_ID;
+	protected $primaryKey = ContainerWidgetsEntity::CONTAINER_ID;
 
     /**
-     * @var WidgetEntity
+     * @var ContainerWidgetsEntity
      */
     protected $entityObject;
 
@@ -28,21 +29,16 @@ class ContainerWidgetsTable extends AbstractTableGateway
      */
     public function init()
     {
-        $entityObject       = new WidgetEntity();
+        $entityObject       = new ContainerWidgetsEntity();
         $this->entityObject = $entityObject;
 
         // set default table columns on initialize, can used within features
         $this->columns      = array_keys($entityObject->getArrayCopy());
-
-        // put this on last, reason is on pre(Action) manipulate columns raw dataSet
-        $feature = new DmsFeature($this->columns);
-        $this->featureSet->addFeature($feature);
-        $this->featureSet->setTableGateway($this);
     }
 
     /**
      * Post Initialize Table
-     * - add WidgetEntity as Row Result Prototype
+     * - add ContainerWidgetEntity as Row Result Prototype
      */
     public function postInit()
     {

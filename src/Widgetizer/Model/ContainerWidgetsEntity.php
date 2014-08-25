@@ -10,7 +10,7 @@ class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
     const ROUTE_NAME        = 'route_name';        // name of page route
     const IDENTIFIER_PARAMS = 'identifier_params'; // this identifier help to mix four up tables with other params
                                                    // i suggest path/scheme/params as identifier value
-    const WIDGET_ID         = 'widget_id';         // identifier relation to widget table
+    const WIDGET_UID        = 'widget_uid';        // identifier relation to widget table
 
     /**
      * @var array
@@ -22,7 +22,7 @@ class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
         self::TEMPLATE_AREA     => null,
         self::ROUTE_NAME        => null,
         self::IDENTIFIER_PARAMS => null,
-        self::WIDGET_ID         => null,
+        self::WIDGET_UID        => null,
     );
 
     /**

@@ -2,6 +2,7 @@
 namespace Widgetizer\Model;
 
 use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
+use Widgetizer\Model\TableGateway\ContainerWidgetsTable;
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
 use Zend\Db\ResultSet\ResultSet;
@@ -37,7 +38,7 @@ class ContainerWidgetsModel extends AbstractEventModel
     public function getTableGateway()
     {
         if (!$this->tableGateway) {
-            $tableGateway = new WidgetTable();
+            $tableGateway = new ContainerWidgetsTable();
             $this->tableGateway = $tableGateway;
         }
 

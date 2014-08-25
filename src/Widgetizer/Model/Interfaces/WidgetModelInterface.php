@@ -6,7 +6,7 @@ use Widgetizer\Model\WidgetEntity;
 interface WidgetModelInterface
 {
     /**
-     * Get Widget Entity By ID
+     * Get Widget Entity By UID
      *
      * @param string $uid Unique Widget App. ID
      *
