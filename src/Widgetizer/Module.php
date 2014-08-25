@@ -5,6 +5,7 @@ use Widgetizer\Listeners\WidgetizeAggregateListener;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
@@ -18,6 +19,7 @@ use Zend\ServiceManager\ServiceManager;
 class Module implements
     InitProviderInterface,
     BootstrapListenerInterface,
+    ConfigProviderInterface,
     AutoloaderProviderInterface
 {
     /**
@@ -76,6 +78,16 @@ class Module implements
             ->getEventManager()
             ->attach($listenerAggr)
         ;
+    }
+
+    /**
+     * Returns configuration to merge with application configuration
+     *
+     * @return array|\Traversable
+     */
+    public function getConfig()
+    {
+        return include __DIR__ . '/../../config/module.config.php';
     }
 
     /**
