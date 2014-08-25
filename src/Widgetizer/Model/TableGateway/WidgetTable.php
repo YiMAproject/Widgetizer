@@ -3,6 +3,7 @@ namespace Widgetizer\Model\TableGateway;
 
 use Poirot\Dataset;
 use yimaBase\Db\TableGateway\AbstractTableGateway;
+use yimaBase\Db\TableGateway\Feature\DmsFeature;
 use Zend\Db\ResultSet\ResultSet;
 use Widgetizer\Model\WidgetEntity;
 
@@ -32,6 +33,11 @@ class WidgetTable extends AbstractTableGateway
 
         // set default table columns on initialize, can used within features
         $this->columns      = array_keys($entityObject->getArrayCopy());
+
+        // put this on last, reason is on pre(Action) manipulate columns raw dataSet
+        $feature = new DmsFeature($this->columns);
+        $this->featureSet->addFeature($feature);
+        $this->featureSet->setTableGateway($this);
     }
 
     /**
