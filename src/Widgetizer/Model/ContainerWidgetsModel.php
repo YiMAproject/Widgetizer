@@ -4,6 +4,7 @@ namespace Widgetizer\Model;
 use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
+use Zend\Db\ResultSet\ResultSet;
 use Zend\ServiceManager\ServiceManager;
 use Widgetizer\Model\TableGateway\WidgetTable;
 
@@ -46,5 +47,30 @@ class ContainerWidgetsModel extends AbstractEventModel
         }
 
         return $this->tableGateway;
+    }
+
+    /**
+     * Finds widgets by given entity criteria
+     *
+     * @param ContainerWidgetsEntity $entity Conditions
+     * @param int $offset Offset
+     * @param int $count Count
+     *
+     * @return ResultSet
+     */
+    public function find(ContainerWidgetsEntity $entity, $offset = null, $count = null)
+    {
+        // create criteria condition from Entity
+        $conditions = array();
+        foreach ($entity as $key => $val) {
+            if ($val === ContainerWidgetsEntity::getDefaultEmptyValue())
+                continue;
+
+            $conditions[$key] = $val;
+        }
+
+        $result = $this->getTableGateway()->select($conditions);
+
+        return $result;
     }
 }
