@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `widgetizer_container_widgets` (
   `route_name` varchar(80) DEFAULT NULL,
   `identifier_params` varchar(255) DEFAULT NULL COMMENT 'this identifier help to mix four up tables with other params, suggest path/scheme/params as identifier value',
   `widget_uid` varchar(255) NOT NULL COMMENT 'identifier relation to widget table',
+  `order` int(11) NOT NULL DEFAULT '5',
   PRIMARY KEY (`container_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 

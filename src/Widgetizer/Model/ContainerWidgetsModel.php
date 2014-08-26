@@ -6,6 +6,7 @@ use Widgetizer\Model\TableGateway\ContainerWidgetsTable;
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
 use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Select;
 use Zend\ServiceManager\ServiceManager;
 use Widgetizer\Model\TableGateway\WidgetTable;
 
@@ -59,8 +60,10 @@ class ContainerWidgetsModel extends AbstractEventModel
      *
      * @return ResultSet
      */
-    public function find(ContainerWidgetsEntity $entity, $offset = null, $count = null)
+    public function find(ContainerWidgetsEntity $entity, $order = 'DESC', $offset = null, $count = null)
     {
+        $order = ($order) ?: 'DESC';
+
         // create criteria condition from Entity
         $conditions = array();
         foreach ($entity as $key => $val) {
@@ -70,7 +73,18 @@ class ContainerWidgetsModel extends AbstractEventModel
             $conditions[$key] = $val;
         }
 
-        $result = $this->getTableGateway()->select($conditions);
+        $select = $this->getTableGateway()->getSql()
+            ->select()
+            ->where($conditions)
+            ->order(ContainerWidgetsEntity::CONTAINER_ID.' '.$order)
+        ;
+
+        if ($offset)
+            $select->offset($offset);
+        if ($count)
+            $select->limit($count);
+
+        $result = $this->getTableGateway()->selectWith($select);
 
         return $result;
     }

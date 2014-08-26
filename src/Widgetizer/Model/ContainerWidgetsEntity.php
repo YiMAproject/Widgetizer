@@ -11,6 +11,7 @@ class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
     const IDENTIFIER_PARAMS = 'identifier_params'; // this identifier help to mix four up tables with other params
                                                    // i suggest path/scheme/params as identifier value
     const WIDGET_UID        = 'widget_uid';        // identifier relation to widget table
+    const ORDER             = 'order';             // order num.
 
     /**
      * @var array
@@ -23,6 +24,7 @@ class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
         self::ROUTE_NAME        => null,
         self::IDENTIFIER_PARAMS => null,
         self::WIDGET_UID        => null,
+        self::ORDER             => 5,
     );
 
     /**
