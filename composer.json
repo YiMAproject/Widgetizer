@@ -25,6 +25,7 @@
     "require-dev": {
         "rayamedia/yima-theme": "dev-master",
         "rayamedia/yima-widgetator": "dev-master",
+        "rayamedia/yima-authorize": "dev-master",
         "rayamedia/yima-base": "dev-master"
     },
     "autoload" : {

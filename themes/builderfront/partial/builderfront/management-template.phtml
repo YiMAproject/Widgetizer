@@ -1,0 +1,14 @@
+<?php
+    $this->inlineScript()
+        ->captureStart();
+?>
+// <script type="text/javascript">
+    (function($){
+        $(document).ready(function(){
+            alert('Start Widgets Management');
+        });
+    })(jQuery);
+// </script>
+<?php $this->inlineScript()
+        ->captureEnd();
+?>
