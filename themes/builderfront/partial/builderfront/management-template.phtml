@@ -1,3 +1,4 @@
+<?php if (\Widgetizer\Service\ShareRegistery::isManagementAllowed()) { ?>
 <?php
     $this->inlineScript()
         ->captureStart();
@@ -5,10 +6,11 @@
 // <script type="text/javascript">
     (function($){
         $(document).ready(function(){
-            alert('Start Widgets Management');
+            console.log('Start Widgets Management');
         });
     })(jQuery);
 // </script>
 <?php $this->inlineScript()
         ->captureEnd();
 ?>
+<?php } ?>

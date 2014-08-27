@@ -58,6 +58,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
      *
      * @param MvcEvent $e MVC Event
      *
+     * @return bool
      * @throws \Exception
      */
     public function onRenderWidgetizer(MvcEvent $e)
@@ -91,7 +92,10 @@ class WidgetizeAggregateListener extends ParentalShare implements
     /**
      * Render Widget From Container Result
      *
-     * @param CWE $r
+     * @param CWE       $r         Container Widget Entity
+     * @param ViewModel $viewModel View Model
+     *
+     * @return bool
      */
     protected function renderWidget(CWE $r, ViewModel $viewModel)
     {
@@ -151,16 +155,37 @@ class WidgetizeAggregateListener extends ParentalShare implements
         if (! ShareRegistery::isManagementAllowed())
             return false;
 
-        /* @TODO Get layout areas and fill with default values */
-        // $viewModel->content = '';
+        $config     = $viewModel->config();
+        $template   = $viewModel->getTemplate();
+        $areaPlaces = array();
+        if ($config->layouts && $config->layouts->{$template}) {
+            if ($config->layouts->{$template}->areas) {
+                $areaPlaces = $config->layouts->{$template}->areas;
+                foreach($areaPlaces as $area) {
+                    // editable area places
+                    if (!$viewModel->{$area}) {
+                        // fill for empty area template
+                        $view = $this->getViewRenderer();
+                        $deContent = new ViewModel(array('area' => $area));
+                        $deContent->setTemplate('partial/builderfront/empty-area-decorator');
+                        $content = $view->render($deContent);
+                        $viewModel->{$area} = $content;
+                    }
+                }
+            }
+        }
 
-        foreach ($viewModel->getVariables() as $var => $content) {
-            $view = $this->getViewRenderer();
-            $deContent = new ViewModel(array('content' => $content));
-            $deContent->setTemplate('partial/builderfront/surround-area-decorator');
+        if ($areaPlaces) {
+            foreach ($viewModel->getVariables() as $var => $content) {
+                if (!in_array($var, $areaPlaces))
+                    continue;
+                $view = $this->getViewRenderer();
+                $deContent = new ViewModel(array('content' => $content));
+                $deContent->setTemplate('partial/builderfront/surround-area-decorator');
 
-            $content = $view->render($deContent);
-            $viewModel->{$var} = $content;
+                $content = $view->render($deContent);
+                $viewModel->{$var} = $content;
+            }
         }
     }
 
