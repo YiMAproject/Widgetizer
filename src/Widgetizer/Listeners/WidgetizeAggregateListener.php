@@ -50,6 +50,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
     public function attach(EventManagerInterface $events)
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetizer'), -9000);
+        $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderHighlightAreas'), -9000);
     }
 
     /**
@@ -128,6 +129,39 @@ class WidgetizeAggregateListener extends ParentalShare implements
         }
 
         $viewModel->{$template_area} .= $content;
+    }
+
+    /**
+     * Decorate Area For UI Management
+     *
+     * @param MvcEvent $e Event
+     *
+     * @return bool
+     */
+    public function onRenderHighlightAreas(MvcEvent $e)
+    {
+        $result = $e->getResult();
+        if ($result instanceof Response)
+            return false;
+
+        $viewModel = $e->getViewModel();
+        if (! $viewModel instanceof ThemeDefaultInterface)
+            return false;
+
+        if (! ShareRegistery::isManagementAllowed())
+            return false;
+
+        /* @TODO Get layout areas and fill with default values */
+        // $viewModel->content = '';
+
+        foreach ($viewModel->getVariables() as $var => $content) {
+            $view = $this->getViewRenderer();
+            $deContent = new ViewModel(array('content' => $content));
+            $deContent->setTemplate('partial/builderfront/surround-area-decorator');
+
+            $content = $view->render($deContent);
+            $viewModel->{$var} = $content;
+        }
     }
 
     /**
