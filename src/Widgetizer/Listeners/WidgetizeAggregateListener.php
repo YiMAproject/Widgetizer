@@ -186,6 +186,9 @@ class WidgetizeAggregateListener extends ParentalShare implements
                 $content = $view->render($deContent);
                 $viewModel->{$var} = $content;
             }
+        } else {
+            // No Need Management UI
+            ShareRegistery::$isAllowedManagement = false;
         }
     }
 
