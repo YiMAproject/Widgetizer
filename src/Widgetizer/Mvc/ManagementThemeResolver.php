@@ -1,6 +1,8 @@
 <?php
 namespace Widgetizer\Mvc;
 
+use Widgetizer\Service\ParentalShare;
+use Widgetizer\Service\ShareRegistery;
 use yimaTheme\Resolvers\LocatorResolverAwareInterface;
 use yimaTheme\Resolvers\ResolverInterface;
 use yimaTheme\Theme\LocatorDefaultInterface;
@@ -14,7 +16,7 @@ use yimaTheme\Theme\LocatorDefaultInterface;
  *
  * @package yimaAdminor\Mvc
  */
-class ManagementThemeResolver implements
+class ManagementThemeResolver extends ParentalShare implements
     ResolverInterface,
     LocatorResolverAwareInterface
 {
@@ -41,11 +43,7 @@ class ManagementThemeResolver implements
                   : false;
         }
 
-        // get registered PermissionsManager service and retrieve plugin
-        $permissionsManager = $sm->get('yimaAuthorize.PermissionsManager');
-        /** @var $permission \yimaAuthorize\Permission\PermissionInterface */
-        $permission = $permissionsManager->get($config['authorize_permission']);
-        if (!$permission->isAllowed()) {
+        if (!ShareRegistery::isManagementAllowed()) {
             // user not authorized to permission
             return false;
         }

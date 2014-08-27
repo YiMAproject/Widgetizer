@@ -1,7 +1,11 @@
 <?php
 namespace Widgetizer;
 
+include_once 'Service/ParentalShare.php';
+
 use Widgetizer\Listeners\WidgetizeAggregateListener;
+use Widgetizer\Service\ParentalShare;
+use Widgetizer\Service\ShareRegistery;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
@@ -17,7 +21,7 @@ use Zend\ServiceManager\ServiceManager;
  * Class Module
  * @package Widgetizer
  */
-class Module implements
+class Module extends ParentalShare implements
     InitProviderInterface,
     ServiceProviderInterface,
     BootstrapListenerInterface,
@@ -87,6 +91,22 @@ class Module implements
     {
         $sm = $e->getApplication()
             ->getServiceManager();
+
+
+        // --- Set Registry To Detect UI Management by permission ---------------------------------==============================
+        $config = $sm->get('config');
+        if (isset($config['widgetizer']) && is_array($config['widgetizer'])) {
+            $config = $config['widgetizer'];
+        }
+
+        // get registered PermissionsManager service and retrieve plugin
+        $permissionsManager = $sm->get('yimaAuthorize.PermissionsManager');
+        /** @var $permission \yimaAuthorize\Permission\PermissionInterface */
+        $permission = $permissionsManager->get($config['authorize_permission']);
+
+        ShareRegistery::$isAllowedManagement = $permission->isAllowed();
+
+        // --- Attach default Listeners  ---------------------------------=======================================================
 
         $listenerAggr = new WidgetizeAggregateListener();
         $listenerAggr->setServiceManager($sm);

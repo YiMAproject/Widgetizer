@@ -5,6 +5,8 @@ use Widgetizer\Model\ContainerWidgetsEntity as CWE;
 use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
 use Widgetizer\Model\Interfaces\WidgetModelInterface;
 use Widgetizer\Model\WidgetEntity;
+use Widgetizer\Service\ParentalShare;
+use Widgetizer\Service\ShareRegistery;
 use yimaTheme\Theme\ThemeDefaultInterface;
 use yimaWidgetator\Service\WidgetManager;
 use yimaWidgetator\Widget\Interfaces\WidgetInterface;
@@ -15,12 +17,13 @@ use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\View\Model\ViewModel;
+use Zend\View\Renderer\RendererInterface;
 
 /**
  * Class WidgetizeAggregateListener
  * @package Widgetizer\Listeners
  */
-class WidgetizeAggregateListener implements
+class WidgetizeAggregateListener extends ParentalShare implements
     ServiceManagerAwareInterface,
     ListenerAggregateInterface
 {
@@ -111,8 +114,20 @@ class WidgetizeAggregateListener implements
             // load prop. entities into widget
             $widget->setFromArray($w->getArrayCopy());
         }
+
         $template_area = $r->get(CWE::TEMPLATE_AREA);
-        $viewModel->{$template_area} .= $widget->render();
+        if (ShareRegistery::isManagementAllowed()) {
+            // Decorate widgets with ui management partial template
+            $view = $this->getViewRenderer();
+            $widgetViewModel = new ViewModel(array('widget' => $widget));
+            $widgetViewModel->setTemplate('partial/builderfront/surround-widgets-decorator');
+            $content = $view->render($widgetViewModel);
+        } else {
+            // Render Widget
+            $content = $widget->render();
+        }
+
+        $viewModel->{$template_area} .= $content;
     }
 
     /**
@@ -138,5 +153,17 @@ class WidgetizeAggregateListener implements
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->sm = $serviceManager;
+    }
+
+    /**
+     * Get View Renderer
+     *
+     * @return RendererInterface
+     */
+    public function getViewRenderer()
+    {
+        $view = $this->sm->get('ViewRenderer');
+
+        return $view;
     }
 }
