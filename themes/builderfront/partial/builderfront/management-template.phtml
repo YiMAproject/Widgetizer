@@ -1,16 +1,22 @@
-<?php if (\Widgetizer\Service\ShareRegistery::isManagementAllowed()) { ?>
-<?php
-    $this->inlineScript()
-        ->captureStart();
+<?php if (! \Widgetizer\Service\ShareRegistery::isManagementAllowed())
+    return ; // It's not necessary to render UI Management
 ?>
+
+<?php $this->inlineScript()->captureStart(); ?>
 // <script type="text/javascript">
     (function($){
-        $(document).ready(function(){
-            console.log('Start Widgets Management');
+        $( window ).load(function() {
+            $('#builderfront_loader').fadeOut();
         });
     })(jQuery);
 // </script>
-<?php $this->inlineScript()
-        ->captureEnd();
-?>
-<?php } ?>
+<?php $this->inlineScript()->captureEnd(); ?>
+
+<?php $this->headLink()
+    ->appendStylesheet($this->basePath().'/builderfront/css/style.css')
+; ?>
+
+<div id="builderfront_loader">
+    <img src="<?php echo $this->basePath(); ?>/builderfront/images/loading.gif" alt="Loading...">
+    <?php echo $this->translate('Loading elements...', 'Widgetizer');?>
+</div>

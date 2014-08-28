@@ -1,0 +1,19 @@
+#builderfront_loader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 10000;
+    text-align: center;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+#builderfront_loader > img {
+    display: block;
+    width: 128px;
+    height: 128px;
+    margin: 150px auto 0px;
+}
