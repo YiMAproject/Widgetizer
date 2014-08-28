@@ -9,22 +9,22 @@
     var DRAGGABLE_ELEMENT = '.builderfront_element_dragable';
 
     $(window).load(function() {
-        makeSortable();
+        makeDropable();
         makeDraggable();
     });
 
-    function makeSortable()
+    function makeDropable()
     {
         var sortables = $(AREA_PLACEHOLDER);
 
-        sortables.sortable({
+        sortables.droppable({
             accept: DRAGGABLE_ELEMENT,
-            greedy: true, // any parent droppables will not receive the element. The drop event event.target can be checked to see which droppable received the draggable element.
+            greedy: false, // any parent droppables will not receive the element. The drop event event.target can be checked to see which droppable received the draggable element.
             scope: "widgetizer",
             // Triggered when the droppable is created
             create: function(event, ui){
-                var placeHolder = event.target;
-                $(placeHolder).find('.builderfront_start_empty_area').removeClass('ui-sortable-handle');
+                var $placeHolder = event.target;
+                $($placeHolder).find('.builderfront_start_empty_area').removeClass('ui-sortable-handle');
             },
             // Triggered when an accepted draggable starts dragging
             activate: function(event, ui){
@@ -36,23 +36,28 @@
             },
             // Triggered when an accepted draggable is dropped on the droppable
             drop: function(event, ui){
+                var $placeHolder = event.target;
+                var $draggable   = ui.draggable;
+
+                var $widget = $draggable.attr('id');
+                $($placeHolder).widgetizerDrop({widget: $widget});
             },
             // Triggered when an accepted draggable is dragged out of the droppable
             out: function(event, ui){
-                var placeHolder = event.target;
-                if( $(placeHolder).find('.ui-sortable-handle').size() == 0 ) {
+                var $placeHolder = event.target;
+                if( $($placeHolder).find('.ui-sortable-handle').size() == 0 ) {
                     // Bring Drop Message, We didn`t have any widget inserted
-                    $(placeHolder).find('.builderfront_start_empty_area').fadeIn();
+                    $($placeHolder).find('.builderfront_start_empty_area').fadeIn();
                 }
             },
             // Triggered when an accepted draggable is dragged over the droppable
             over: function(event, ui){
                 // change dragable
-                var $draggable = ui.helper;
+                var $draggable = ui.helper; // draggable helper
                 $draggable.html('Drop Me Here');
                 // clear empty drop message
-                var placeHolder = event.target;
-                $(placeHolder).find('.builderfront_start_empty_area').fadeOut();
+                var $placeHolder = event.target;
+                $($placeHolder).find('.builderfront_start_empty_area').fadeOut();
             }
         });
     }
@@ -61,10 +66,11 @@
     {
         $(DRAGGABLE_ELEMENT).each(function(){
             $(this).draggable({
+                scope: "widgetizer", // A draggable with the same scope value as a droppable will be accepted by the droppable
                 // addClasses: false,
                 appendTo: 'body',
                 // cancel: ".title", // Prevents from dragging
-                connectToSortable: AREA_PLACEHOLDER,
+                // connectToSortable: AREA_PLACEHOLDER,
                 // cursor: "crosshair",
                 delay: 100,
                 helper: function() {
@@ -75,12 +81,31 @@
                 refreshPositions: true,
                 revert: 'invalid',
                 revertDuration: 300,
-                scope: "widgetizer", // A draggable with the same scope value as a droppable will be accepted by the droppable
                 snap: true,
                 snapMode: "inner",
                 snapTolerance: 30
             });
         });
+    }
+
+
+    $.fn.widgetizerDrop = function (options)
+    {
+        var defaults = {
+            widget: '',            // prefixed widget name exp. widgetizer-[widgetNameHere]
+            method: 'render',      // call method from widget object
+            params: {}
+        };
+
+        options = $.extend(false, defaults, options);
+
+        options.params.html_content = $('.jumbotron').html();
+
+        // widgetizer-[widgetNameHere]
+        $widgetArr = options.widget.split('-');
+        options.widget = $widgetArr[1];
+
+        $(this).widgetator(options);
     }
 
 })(jQuery);

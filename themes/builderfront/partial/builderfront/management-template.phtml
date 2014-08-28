@@ -2,14 +2,6 @@
     return ; // It's not necessary to render UI Management
 ?>
 
-<?php
-$this->inlineScript()
-    ->appendFile($this->basePath().'/builderfront/js/jquery-ui.min.js')
-    ->appendFile($this->basePath().'/builderfront/js/jquery.ui.touch-punch.min.js')
-    ->appendFile($this->basePath().'/builderfront/js/main.js')
-;
-?>
-
 <?php $this->inlineScript()->captureStart(); ?>
 // <script type="text/javascript">
     (function($){
@@ -18,17 +10,28 @@ $this->inlineScript()
         });
     })(jQuery);
 // </script>
-<?php $this->inlineScript()->captureEnd(); ?>
+<?php $this->inlineScript()->captureEnd();
 
-<?php $this->headLink()
+$this->inlineScript()
+    ->appendFile($this->basePath().'/builderfront/js/jquery-ui.min.js')
+    ->appendFile($this->basePath().'/builderfront/js/jquery.ui.touch-punch.min.js')
+    ->appendFile($this->basePath().'/builderfront/js/main.js')
+;
+
+$this->headLink()
     ->appendStylesheet($this->basePath().'/builderfront/css/style.css')
-; ?>
+;
+
+// Enable Widgetator scripts to ajax calls
+$this->widgetAjaxy()
+    ->attachScripts();
+?>
 
 <div id="builderfront_loader">
     <img src="<?php echo $this->basePath(); ?>/builderfront/images/loading.gif" alt="Loading...">
     <?php echo $this->translate('Loading elements...', 'Widgetizer');?>
 </div>
 
-<div class="builderfront_element_dragable">
+<div id="widgetizer-inplacehtmleditor" class="builderfront_element_dragable">
     <img src="<?php echo $this->basePath(); ?>/builderfront/images/widget.jpg">
 </div>
