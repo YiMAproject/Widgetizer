@@ -6,4 +6,15 @@
 <!--
     Empty Area will fill with this template
 -->
-<p>Add Your First Widget on <?php echo $area ?></p>
+<div class="builderfront_start_empty_area">
+    <span>
+        <?php
+        echo $this->translate(
+            sprintf(
+                'Drag widget elements onto the ( %s ) canvas', $area
+            )
+            , 'Widgetizer'
+        );
+        ?>
+    </span>
+</div>

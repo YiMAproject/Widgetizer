@@ -17,3 +17,31 @@
     height: 128px;
     margin: 150px auto 0px;
 }
+
+.builderfront_area_holder {
+    border: 1px dashed #002a80;
+    padding: 5px;
+}
+
+.builderfront_area_holder_hover {
+    border: 1px dashed #ff0000;
+}
+
+.builderfront_start_empty_area {
+    width: 100%;
+    z-index: 99;
+}
+
+.builderfront_start_empty_area > span {
+    display: block;
+    background: #34495E;
+    padding: 10px 20px;
+    width: 50%;
+    color: #fff;
+    font-size: 13px;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 10px auto;
+}
+
+.builderfront_element_dragable { border: 1px solid crimson; width: 100px; }
