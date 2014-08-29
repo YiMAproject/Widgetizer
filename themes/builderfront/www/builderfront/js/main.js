@@ -9,8 +9,9 @@
     var DRAGGABLE_ELEMENT = '.builderfront_element_dragable';
 
     $(window).load(function() {
-        makeDropable();
+        //makeDropable();
         makeDraggable();
+        makeSortable();
     });
 
     function makeDropable()
@@ -39,6 +40,9 @@
                 var $placeHolder = event.target;
                 var $draggable   = ui.draggable;
 
+                // fade out empty message
+                $($placeHolder).find('.builderfront_start_empty_area').fadeOut();
+
                 var $widget = $draggable.attr('id');
                 $($placeHolder).widgetizerDrop({widget: $widget});
             },
@@ -52,12 +56,13 @@
             },
             // Triggered when an accepted draggable is dragged over the droppable
             over: function(event, ui){
-                // change dragable
-                var $draggable = ui.helper; // draggable helper
+                // change dragable to drop here
+                var $draggable = ui.helper;
                 $draggable.html('Drop Me Here');
+
                 // clear empty drop message
                 var $placeHolder = event.target;
-                $($placeHolder).find('.builderfront_start_empty_area').fadeOut();
+                //$($placeHolder).find('.builderfront_start_empty_area').fadeOut();
             }
         });
     }
@@ -70,8 +75,8 @@
                 // addClasses: false,
                 appendTo: 'body',
                 // cancel: ".title", // Prevents from dragging
-                // connectToSortable: AREA_PLACEHOLDER,
-                // cursor: "crosshair",
+                connectToSortable: AREA_PLACEHOLDER,
+                cursor: "move",
                 delay: 100,
                 helper: function() {
                     return $('<div style="height: 80px; width: 100px; background: #F9FAFA; box-shadow: 5px 5px 1px rgba(0,0,0,0.1); text-align: center; line-height: 100px; font-size: 10px; color: #16A085">Drop Me To Area</div>');
@@ -83,12 +88,139 @@
                 revertDuration: 300,
                 snap: true,
                 snapMode: "inner",
-                snapTolerance: 30
+                snapTolerance: 30,
+
+                // Triggered when an accepted draggable starts dragging
+                start: function(event, ui){
+                    _highlightAllAreas();
+                },
+                stop: function(event, ui){
+                    _downlightAllAreas();
+                }
             });
         });
     }
 
+    function makeSortable()
+    {
+        var sortables = $(AREA_PLACEHOLDER);
 
+        sortables.sortable({
+            appendTo: AREA_PLACEHOLDER,
+            axis: "y",
+            //connectWith: AREA_PLACEHOLDER, // move widgets to another places
+            cursor: "move",
+            // Specifies which items inside the element should be sortable
+            items: ".builderfront_widget_holder",
+            create: function(event, ui){
+                var $placeholder = $(event.target);
+                // we don't want empty message as an item
+                $placeholder.find('.builderfront_start_empty_area').removeClass('ui-sortable ui-sortable-handle');
+            },
+            receive: function(event, ui){
+                var $placeHolder = event.target;
+                var $draggable   = ui.item;
+                var $widget      = $draggable.attr('id'); // used as param to load widget
+
+                if (! ui.sender.hasClass('builderfront_element_dragable')){
+                    // Received from draggable (not moved from another place)
+                }
+
+                // fade out empty message
+                $($placeHolder).find('.builderfront_start_empty_area').fadeOut();
+
+                // load widget content into received draggable
+                var $rd = $($placeHolder).find('.builderfront_element_dragable');
+                $($rd).widgetizerDrop({widget: $widget});
+            },
+            // This event is triggered when a sortable item is moved into a sortable list
+            over: function(event, ui){
+                _highlightPlaceholder($(event.target));
+                _helperDropMe(ui.helper);
+            },
+            out: function(event, ui){
+                _downlightPlaceholder($(event.target));
+            }
+        });
+    }
+
+    /**
+     * Highlight All Widget Places Areas
+     * : show user places that can drop widgets
+     *
+     * @private
+     */
+    function _highlightAllAreas() {
+        $(AREA_PLACEHOLDER).addClass("builderfront_area_holder_hover");
+    }
+
+    /**
+     * Remove Highlighted Effects on Areas
+     * @see _highlightAllAreas()
+     * @private
+     */
+    function _downlightAllAreas() {
+        $(AREA_PLACEHOLDER).removeClass("builderfront_area_holder_hover");
+    }
+
+    /**
+     * Highlight a placeholder
+     * : usually call when user drag element over placeholder
+     * @param $placeholder
+     * @private
+     */
+    function _highlightPlaceholder($placeholder) {
+        $placeholder.addClass("builderfront_area_holder_hover");
+
+        // fade out empty message
+        $placeholder.find('.builderfront_start_empty_area').fadeOut();
+    }
+
+    /**
+     * Remove Highlighted Effects on a placeholder
+     * @see _highlightPlaceholder()
+     * @private
+     */
+    function _downlightPlaceholder($placeholder) {
+        $placeholder.removeClass("builderfront_area_holder_hover");
+
+        // fade in empty message
+        if($placeholder.find('.builderfront_widget_holder').size() == 0 ) {
+            // Bring Drop Message, We didn`t have any widget inserted
+            $placeholder.find('.builderfront_start_empty_area').fadeIn();
+        }
+    }
+
+    /**
+     * Represent Drop Me Message On Draggable Helper
+     * : happen when user drag over placeholder
+     * @param $helper
+     * @private
+     */
+    function _helperDropMe($helper)
+    {
+        if (!$helper.hasClass('builderfront_widget_holder')) {
+            // this is draggable helper
+            $helper.html('Drop Me Here ...');
+        }
+    }
+
+    /**
+     * Revert Helper Drop Me Message
+     *
+     * @param $helper
+     * @private
+     */
+    function _revertHelperDropMe($helper)
+    {
+        $helper.html('Drag Me to an Area');
+    }
+
+    /**
+     * Load Widget by making ajax call
+     *
+     * @param options
+     */
     $.fn.widgetizerDrop = function (options)
     {
         var defaults = {
@@ -101,11 +233,22 @@
 
         options.params.html_content = $('.jumbotron').html();
 
+        // Append Widget Holder
+        var $widgetHolder = $(this);
+        $widgetHolder.attr('class', 'builderfront_widget_holder builderfront_loading_content');
+        $widgetHolder.attr('rel-data', options.widget);
+        $widgetHolder.html('');
+
         // widgetizer-[widgetNameHere]
-        $widgetArr = options.widget.split('-');
+        var $widgetArr = options.widget.split('-');
         options.widget = $widgetArr[1];
 
-        $(this).widgetator(options);
+        options.callback = function(element, response) {
+            element.removeClass('builderfront_loading_content');
+            $.fn.widgetator.defaultCallback(element, response);
+        };
+
+        $($widgetHolder).widgetator(options);
     }
 
 })(jQuery);

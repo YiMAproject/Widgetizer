@@ -21,6 +21,7 @@
 .builderfront_area_holder {
     border: 1px dashed #002a80;
     padding: 5px;
+    min-height: 100px;
 }
 
 .builderfront_area_holder_hover {
@@ -44,4 +45,19 @@
     margin: 10px auto;
 }
 
-.builderfront_element_dragable { border: 1px solid crimson; width: 100px; }
+.builderfront_element_dragable {
+    border: 1px solid crimson;
+    width: 100px;
+}
+
+.builderfront_widget_holder {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.builderfront_loading_content {
+    width: 100%;
+    min-height: 70px;
+    border: solid 1px #942a25;
+}
