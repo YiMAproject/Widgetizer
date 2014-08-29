@@ -56,6 +56,12 @@
             axis: "y",
             //connectWith: AREA_PLACEHOLDER, // move widgets to another places
             cursor: "move",
+            delay: 150,
+            // Restricts sort start click to the specified element
+            handle: ".builderfront_settings",
+            opacity: 0.5,
+            // A class name that gets applied to the otherwise white space
+            placeholder: "sortable-placeholder",
             // Specifies which items inside the element should be sortable
             items: ".ui-sortable-handle",
             create: function(event, ui){
@@ -196,12 +202,30 @@
             element.removeClass('builderfront_loading_content');
             $.fn.widgetator.defaultCallback(element, response);
 
-            //add widget buttons
-            delButton = $('<button type="button" class="builderfront_settings builderfront_btn btn-danger"><span class="fa fa-trash-o  white"></span> remove</button>');
-            element.append(delButton);
+            // add widget settings buttons
+            var $settingContainer = $('<div></div>').addClass('builderfront_settings');
+                var $delButton = $('<button type="button"><span class="fa fa-trash-o  white"></span> remove</button>');
+                $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
+                var $editButton = $('<button type="button"><span class="fa fa-pencil  white"></span> edit</button>');
+                $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
+
+                $settingContainer
+                    .append($editButton)
+                    .append($delButton)
+                ;
+            element.append($settingContainer);
         };
 
         $($widgetHolder).widgetator(options);
     }
+
+    // =======================================================================================================================================
+    // Setting Buttons Action
+    $(document).ready(function() {
+        $('.builderfront_settings_item').bind( 'click', function() {
+            console.log($(this));
+        });
+    });
+
 
 })(jQuery);
