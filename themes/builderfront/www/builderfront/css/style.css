@@ -61,3 +61,21 @@
     min-height: 70px;
     border: solid 1px #942a25;
 }
+
+.builderfront_widget_holder .builderfront_settings{
+    border-radius: 0px;
+    float: right;
+    visibility:hidden;
+    opacity:0;
+    transition: visibility 0s linear 0.5s,opacity 0.5s linear;
+    -webkit-transition: visibility 0s linear 0.5s,opacity 0.5s linear;
+    -moz-transition: visibility 0s linear 0.5s,opacity 0.5s linear;
+    width: 100px;
+}
+
+.builderfront_widget_holder:hover .builderfront_settings {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+}
+
