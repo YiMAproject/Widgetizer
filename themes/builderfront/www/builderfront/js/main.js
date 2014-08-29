@@ -220,6 +220,17 @@
             // append widget extra elements
             appendSortableHandler(element);
             appendSettingButtons(element);
+
+            $('.builderfront_settings_item').bind( 'click', function() {
+                var $action = $(this).attr('data-rel');
+                if ($action == 'remove') {
+                    var $placeholder = $(this).closest('.ui-sortable');
+                    // first remove widget
+                    $(this).closest('.builderfront_widget_holder').remove();
+                    // revert to place holder default
+                    _downlightPlaceholder($placeholder);
+                }
+            });
         };
 
         $($widgetHolder).widgetator(options); // <== LOAD WIDGET
@@ -237,9 +248,9 @@
         // append widget setting buttons elements
         function appendSettingButtons(element) {
             var $settingContainer = $('<div></div>').addClass('builderfront_settings');
-            var $delButton = $('<button type="button"><span class="fa fa-trash-o  white"></span></button>');
+            var $delButton = $('<button type="button" data-rel="remove"><span class="fa fa-trash-o  white"></span></button>');
             $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
-            var $editButton = $('<button type="button"><span class="fa fa-pencil  white"></span></button>');
+            var $editButton = $('<button type="button" data-rel=""><span class="fa fa-pencil  white"></span></button>');
             $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
 
             $settingContainer
@@ -251,12 +262,5 @@
     }
 
     // =======================================================================================================================================
-    // Setting Buttons Action
-    $(document).ready(function() {
-        $('.builderfront_settings_item').bind( 'click', function() {
-            console.log($(this));
-        });
-    });
-
 
 })(jQuery);
