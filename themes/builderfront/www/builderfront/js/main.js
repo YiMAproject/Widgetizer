@@ -69,7 +69,7 @@
             handle: '.'+AREA_SORTABLE_HANDLER_CLAS,
             opacity: 0.5,
             // A class name that gets applied to the otherwise white space
-            placeholder: "sortable-placeholder",
+            //placeholder: "sortable-placeholder",
             // Specifies which items inside the element should be sortable
             items: '.' + AREA_SORTABLE_CLASS,
             create: function(event, ui){
