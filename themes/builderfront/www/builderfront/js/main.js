@@ -1,12 +1,20 @@
 (function($)
 {
-    /**
-     * Areas Place Holder
-     * @type {string}
-     */
-    var AREA_PLACEHOLDER  = '.builderfront_area_holder';
+    // also in style.css ---------------------------------------------------
 
-    var DRAGGABLE_ELEMENT = '.builderfront_element_dragable';
+    // Area Place Holders (widgets doped into)
+    var AREA_PLACEHOLDER_SELECTOR  = '.builderfront_area_holder';
+    // The Sortable Elements Inside Area (widgets)
+    var AREA_SORTABLE_CLASS        = 'ui_sortable_element';
+    // Sortable Handler
+    var AREA_SORTABLE_HANDLER_CLAS = 'builderfront_sortable_handler';
+
+    // Draggable Widgets
+    var DRAGGABLE_SELECTOR         = '.builderfront_element_dragable';
+
+    var DRAGGABLE_HELPER_ELEMENT   = $('<div style="height: 80px; width: 100px; background: #F9FAFA; box-shadow: 5px 5px 1px rgba(0,0,0,0.1); text-align: center; line-height: 100px; font-size: 10px; color: #16A085">Drop Me To Area</div>');
+
+    // =====================================================================
 
     $(window).load(function() {
         makeDraggable();
@@ -15,20 +23,20 @@
 
     function makeDraggable()
     {
-        $(DRAGGABLE_ELEMENT).each(function(){
+        $(DRAGGABLE_SELECTOR).each(function(){
             $(this).draggable({
                 scope: "widgetizer", // A draggable with the same scope value as a droppable will be accepted by the droppable
                 // addClasses: false,
                 appendTo: 'body',
                 // cancel: ".title", // Prevents from dragging
-                connectToSortable: AREA_PLACEHOLDER,
+                connectToSortable: AREA_PLACEHOLDER_SELECTOR,
                 cursor: "move",
                 delay: 100,
                 helper: function() {
-                    return $('<div style="height: 80px; width: 100px; background: #F9FAFA; box-shadow: 5px 5px 1px rgba(0,0,0,0.1); text-align: center; line-height: 100px; font-size: 10px; color: #16A085">Drop Me To Area</div>');
+                    return DRAGGABLE_HELPER_ELEMENT;
                 },
                 iframeFix: true,
-                opacity: 0.55,
+                opacity: 0.75,
                 refreshPositions: true,
                 revert: 'invalid',
                 revertDuration: 300,
@@ -49,25 +57,25 @@
 
     function makeSortable()
     {
-        var sortables = $(AREA_PLACEHOLDER);
+        var sortables = $(AREA_PLACEHOLDER_SELECTOR);
 
         sortables.sortable({
-            appendTo: AREA_PLACEHOLDER,
+            appendTo: AREA_PLACEHOLDER_SELECTOR,
             axis: "y",
-            //connectWith: AREA_PLACEHOLDER, // move widgets to another places
+            //connectWith: AREA_PLACEHOLDER_SELECTOR, // move widgets to another places
             cursor: "move",
             delay: 150,
             // Restricts sort start click to the specified element
-            handle: ".builderfront_settings",
+            handle: '.'+AREA_SORTABLE_HANDLER_CLAS,
             opacity: 0.5,
             // A class name that gets applied to the otherwise white space
             placeholder: "sortable-placeholder",
             // Specifies which items inside the element should be sortable
-            items: ".ui-sortable-handle",
+            items: '.' + AREA_SORTABLE_CLASS,
             create: function(event, ui){
                 var $placeholder = $(event.target);
                 // we don't want empty message as an item
-                $placeholder.find('.builderfront_start_empty_area').removeClass('ui-sortable ui-sortable-handle');
+                $placeholder.find('.builderfront_start_empty_area').removeClass(AREA_SORTABLE_CLASS);
             },
             receive: function(event, ui){
                 var $placeHolder = event.target;
@@ -104,7 +112,7 @@
      * @private
      */
     function _highlightAllAreas() {
-        $(AREA_PLACEHOLDER).addClass("builderfront_area_holder_hover");
+        $(AREA_PLACEHOLDER_SELECTOR).addClass("builderfront_area_holder_hover");
     }
 
     /**
@@ -113,7 +121,7 @@
      * @private
      */
     function _downlightAllAreas() {
-        $(AREA_PLACEHOLDER).removeClass("builderfront_area_holder_hover");
+        $(AREA_PLACEHOLDER_SELECTOR).removeClass("builderfront_area_holder_hover");
     }
 
     /**
@@ -187,11 +195,16 @@
         options.params.html_content = $('.jumbotron').html();
 
         // Append Widget Holder >>>>>>>>
+        // note: when draggable falling into place is a clone of element
+        //       we have to reset and load widget content into it.
         var $widgetHolder = $(this);
-        $widgetHolder.attr('class', 'builderfront_widget_holder ui-sortable-handle builderfront_loading_content');
+        $widgetHolder.attr('class',
+            'builderfront_widget_holder '      // this is widget
+            +AREA_SORTABLE_CLASS               // also sortable
+            +' builderfront_loading_content'); // and still loading
         $widgetHolder.attr('rel-data', options.widget);
         $widgetHolder.html('');
-        // <<<<<<<<<<
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
         // widgetizer-[widgetNameHere]
@@ -199,24 +212,42 @@
         options.widget = $widgetArr[1];
 
         options.callback = function(element, response) {
+            // loading was complete
             element.removeClass('builderfront_loading_content');
+            // set widget content into element
             $.fn.widgetator.defaultCallback(element, response);
 
-            // add widget settings buttons
-            var $settingContainer = $('<div></div>').addClass('builderfront_settings');
-                var $delButton = $('<button type="button"><span class="fa fa-trash-o  white"></span> remove</button>');
-                $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
-                var $editButton = $('<button type="button"><span class="fa fa-pencil  white"></span> edit</button>');
-                $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
-
-                $settingContainer
-                    .append($editButton)
-                    .append($delButton)
-                ;
-            element.append($settingContainer);
+            // append widget extra elements
+            appendSortableHandler(element);
+            appendSettingButtons(element);
         };
 
-        $($widgetHolder).widgetator(options);
+        $($widgetHolder).widgetator(options); // <== LOAD WIDGET
+
+        // __________________________________________________________________________________
+
+        function appendSortableHandler(element) {
+            var $handler = $('<div></div>').addClass(AREA_SORTABLE_HANDLER_CLAS);
+                var $icon = $('<span class="fa fa-arrows  white"></span>');
+            $handler.html($icon);
+
+            element.append($handler);
+        }
+
+        // append widget setting buttons elements
+        function appendSettingButtons(element) {
+            var $settingContainer = $('<div></div>').addClass('builderfront_settings');
+            var $delButton = $('<button type="button"><span class="fa fa-trash-o  white"></span></button>');
+            $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
+            var $editButton = $('<button type="button"><span class="fa fa-pencil  white"></span></button>');
+            $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
+
+            $settingContainer
+                .append($editButton)
+                .append($delButton)
+            ;
+            element.append($settingContainer);
+        }
     }
 
     // =======================================================================================================================================
