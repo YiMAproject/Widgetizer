@@ -32,6 +32,8 @@ $this->inlineScript()
 // <script>
     (function($){
         $.fn.widgetizerDrop.restUrl = '<?php echo $restUrl ?>';
+        <?php /** @see theme.bootstrap.php */ ?>
+        WIDGETIZER_REST_REQUEST_TOKEN = '<?php echo $this->widgetizer_rest_token; ?>';
     })(jQuery);
 // </script>
 <?php
@@ -47,15 +49,6 @@ $this->headLink()
 // Enable Widgetator scripts to ajax calls
 $this->widgetAjaxy()
     ->attachScripts();
-
-$theme = $this->theme()->getParentTheme();
-while($theme && !$theme->isFinalTheme()) {
-    $theme = $theme->getParentTheme();
-}
-
-d_r($theme->getName());
-d_r($theme->getTemplate());
-
 ?>
 
 <div id="builderfront_loader">

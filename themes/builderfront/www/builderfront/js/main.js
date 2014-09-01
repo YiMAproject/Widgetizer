@@ -1,5 +1,11 @@
 (function($)
 {
+    /**
+     * @type {string}
+     * @see management-template.phtml
+     */
+    // WIDGETIZER_REST_REQUEST_TOKEN = '';
+
     // also in style.css ---------------------------------------------------
 
     // Area Place Holders (widgets doped into)
@@ -227,8 +233,7 @@
             var $area   = element.closest('.builderfront_area_holder').attr('id');
                 $area   = $area.split('-');
                 $area   = $area[2];
-            var $entity = {template:'builder', layout:'default', area: $area, route: 'default', identifier: '' };
-            saveWidget($wuid, $wname, $entity);
+            saveWidget($wuid, $wname, $area);
 
             // append widget extra elements
             appendSortableHandler(element);
@@ -275,24 +280,22 @@
 
         /**
          * Save widget into db
+         * : Most of data was stored in storage and get on
+         *   rest controller and recognized by token
+         *   @see \Widgetizer\Controller\Admin\WidgetManagementRestController::getValidateData()
          *
          * @param $widgetId   Widget UID
          * @param $widgetname Widget Name
-         * @param $entity     Entity Table Values
+         * @param $area       Which Area
          */
-        function saveWidget($widgetId, $widgetname, $entity)
+        function saveWidget($widgetId, $widgetname, $area)
         {
-            var $defEntity = {
-                template: '',
-                  layout: '',
-                    area: '',
-                   route: '',
-              identifier: ''
+            var $data = {
+                   token: WIDGETIZER_REST_REQUEST_TOKEN,
+                     uid: $widgetId,
+                  widget: $widgetname,
+                    area: $area
             };
-
-            var $data    = $.extend(false, $defEntity, $entity);
-            $data.widget = $widgetname; // widget name
-            $data.uid    = $widgetId;   // widget uid
 
             $.ajaxq('widgetizer', {
                 url     : $.fn.widgetizerDrop.restUrl,

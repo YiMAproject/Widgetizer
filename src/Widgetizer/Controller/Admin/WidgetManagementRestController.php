@@ -24,7 +24,10 @@ class WidgetManagementRestController extends AbstractRestfulController
 
     protected function proccessData($data)
     {
-        d_e($data);
+        $storage = $this->getServiceLocator()->get('Widgetizer.PersistStorage');
+        $storage->setToken($data['token']);
+        d_r($storage->getStorage()->layout);
+        d_e($storage->getStorage()->template);
 
         $exception = false;
         $message   = self::REST_SUCCESS;

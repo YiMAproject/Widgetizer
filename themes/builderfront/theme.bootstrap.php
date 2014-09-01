@@ -12,8 +12,11 @@ use Zend\Stdlib\ArrayUtils;
  * By Default is True
  */
 $this->isFinal = false;
-
 $this->setTemplate('partial/builderfront/management-template');
+
+// inject request token into jscripts
+$storage = $this->getServiceLocator()->get('Widgetizer.PersistStorage');
+$this->setVariable('widgetizer_rest_token', $storage->getToken());
 
 // ---- Register Assets File Into AssetManager Service --------------------------------------------------------------------------------------------\
 /*

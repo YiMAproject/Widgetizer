@@ -49,8 +49,29 @@ class WidgetizeAggregateListener extends ParentalShare implements
      */
     public function attach(EventManagerInterface $events)
     {
+        $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderCreateStorage'), -1000);
         $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetizer'), -9000);
         $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRenderHighlightAreas'), -9000);
+    }
+
+    /**
+     * - Set Template and Layout in Storage
+     *
+     * @param MvcEvent $e Event
+     *
+     * @return bool
+     */
+    public function onRenderCreateStorage(MvcEvent $e)
+    {
+        $viewModel = $e->getViewModel();
+        if (! $viewModel instanceof ThemeDefaultInterface) {
+            return false;
+        }
+
+        $sm = $e->getApplication()->getServiceManager();
+        $storage = $sm->get('Widgetizer.PersistStorage');
+        $storage->setTemplate($viewModel->getName());
+        $storage->setLayout($viewModel->getTemplate());
     }
 
     /**

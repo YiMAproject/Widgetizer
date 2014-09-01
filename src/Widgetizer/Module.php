@@ -76,7 +76,8 @@ class Module extends ParentalShare implements
     {
         return array(
             'invokables' => array(
-                'Widgetizer.Model.ContainerWidgets'   => 'Widgetizer\Model\ContainerWidgetsModel',
+                'Widgetizer.Model.ContainerWidgets' => 'Widgetizer\Model\ContainerWidgetsModel',
+                'Widgetizer.PersistStorage'         => 'Widgetizer\Service\PersistStorage',
             ),
         );
     }
