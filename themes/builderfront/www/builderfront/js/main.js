@@ -81,6 +81,9 @@
                 var $placeHolder = event.target;
                 var $draggable   = ui.item;
                 var $widget      = $draggable.attr('id'); // used as param to load widget
+                // widgetizer-[widgetNameHere]
+                var $widgetArr = $widget.split('-');
+                $widget = $widgetArr[1];
 
                 if (! ui.sender.hasClass('builderfront_element_dragable')){
                     // Received from draggable (not moved from another place)
@@ -92,6 +95,10 @@
                 // load widget content into received draggable
                 var $rd = $($placeHolder).find('.builderfront_element_dragable');
                 $($rd).widgetizerDrop({widget: $widget});
+            },
+            // This event is triggered during sorting, but only when the DOM position has changed
+            change: function(event, ui){
+
             },
             // This event is triggered when a sortable item is moved into a sortable list
             over: function(event, ui){
@@ -185,33 +192,27 @@
     $.fn.widgetizerDrop = function (options)
     {
         var defaults = {
-            widget: '',            // prefixed widget name exp. widgetizer-[widgetNameHere]
-            method: 'render',      // call method from widget object
-            params: {}
+               widget: '',            // widget name
+               method: 'render',      // call method from widget object
+               params: {},
+            interfunc: 'getUid:uid'
         };
 
         options = $.extend(false, defaults, options);
-
-        options.params.html_content = $('.jumbotron').html();
 
         // Append Widget Holder >>>>>>>>
         // note: when draggable falling into place is a clone of element
         //       we have to reset and load widget content into it.
         var $widgetHolder = $(this);
         $widgetHolder.attr('class',
-            'builderfront_widget_holder '      // this is widget
-            +AREA_SORTABLE_CLASS               // also sortable
-            +' builderfront_loading_content'); // and still loading
-        $widgetHolder.attr('rel-data', options.widget);
+            'builderfront_widget_holder '       // this is widget
+            + AREA_SORTABLE_CLASS               // also sortable
+            +' builderfront_loading_content');  // and still loading
+        $widgetHolder.attr('data-name', options.widget);
         $widgetHolder.html('');
         // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
-        // widgetizer-[widgetNameHere]
-        var $widgetArr = options.widget.split('-');
-        options.widget = $widgetArr[1];
-
-        options.callback = function(element, response) {
+        $callback = function(element, response) {
             // loading was complete
             element.removeClass('builderfront_loading_content');
             // set widget content into element
@@ -222,7 +223,7 @@
             appendSettingButtons(element);
 
             $('.builderfront_settings_item').bind( 'click', function() {
-                var $action = $(this).attr('data-rel');
+                var $action = $(this).attr('data-anchor');
                 if ($action == 'remove') {
                     var $placeholder = $(this).closest('.ui-sortable');
                     // first remove widget
@@ -233,7 +234,7 @@
             });
         };
 
-        $($widgetHolder).widgetator(options); // <== LOAD WIDGET
+        $($widgetHolder).widgetator(options, $callback); // <== LOAD WIDGET
 
         // __________________________________________________________________________________
 
@@ -248,9 +249,9 @@
         // append widget setting buttons elements
         function appendSettingButtons(element) {
             var $settingContainer = $('<div></div>').addClass('builderfront_settings');
-            var $delButton = $('<button type="button" data-rel="remove"><span class="fa fa-trash-o  white"></span></button>');
+            var $delButton = $('<button type="button" data-anchor="remove"><span class="fa fa-trash-o  white"></span></button>');
             $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
-            var $editButton = $('<button type="button" data-rel=""><span class="fa fa-pencil  white"></span></button>');
+            var $editButton = $('<button type="button" data-anchor=""><span class="fa fa-pencil  white"></span></button>');
             $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
 
             $settingContainer
