@@ -195,7 +195,7 @@
                widget: '',            // widget name
                method: 'render',      // call method from widget object
                params: {},
-            interfunc: 'getUid:uid'
+            interfunc: 'uid:getUid'
         };
 
         options = $.extend(false, defaults, options);
