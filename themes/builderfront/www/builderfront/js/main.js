@@ -224,7 +224,10 @@
             // ...
             var $wuid   = response.result.uid;
             var $wname  = element.attr('data-name');
-            var $entity = {template:'builder', layout:'default', area: 'content', route: 'default', identifier: '' };
+            var $area   = element.closest('.builderfront_area_holder').attr('id');
+                $area   = $area.split('-');
+                $area   = $area[2];
+            var $entity = {template:'builder', layout:'default', area: $area, route: 'default', identifier: '' };
             saveWidget($wuid, $wname, $entity);
 
             // append widget extra elements

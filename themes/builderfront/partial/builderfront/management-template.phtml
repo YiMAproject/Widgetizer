@@ -47,6 +47,15 @@ $this->headLink()
 // Enable Widgetator scripts to ajax calls
 $this->widgetAjaxy()
     ->attachScripts();
+
+$theme = $this->theme()->getParentTheme();
+while($theme && !$theme->isFinalTheme()) {
+    $theme = $theme->getParentTheme();
+}
+
+d_r($theme->getName());
+d_r($theme->getTemplate());
+
 ?>
 
 <div id="builderfront_loader">
