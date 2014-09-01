@@ -180,7 +180,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
                 if (!in_array($var, $areaPlaces))
                     continue;
                 $view = $this->getViewRenderer();
-                $deContent = new ViewModel(array('content' => $content));
+                $deContent = new ViewModel(array('area' => $var,'content' => $content));
                 $deContent->setTemplate('partial/builderfront/surround-area-decorator');
 
                 $content = $view->render($deContent);

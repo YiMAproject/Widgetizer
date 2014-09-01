@@ -218,6 +218,15 @@
             // set widget content into element
             $.fn.widgetator.defaultCallback(element, response);
 
+            // set element id and save to db
+            element.attr('data-id', response.result.uid);
+            // we need template, layout, area, route_name, widget_id
+            // ...
+            var $wuid   = response.result.uid;
+            var $wname  = element.attr('data-name');
+            var $entity = {template:'builder', layout:'default', area: 'content', route: 'default', identifier: '' };
+            saveWidget($wuid, $wname, $entity);
+
             // append widget extra elements
             appendSortableHandler(element);
             appendSettingButtons(element);
@@ -260,7 +269,44 @@
             ;
             element.append($settingContainer);
         }
+
+        /**
+         * Save widget into db
+         *
+         * @param $widgetId   Widget UID
+         * @param $widgetname Widget Name
+         * @param $entity     Entity Table Values
+         */
+        function saveWidget($widgetId, $widgetname, $entity)
+        {
+            var $defEntity = {
+                template: '',
+                  layout: '',
+                    area: '',
+                   route: '',
+              identifier: ''
+            };
+
+            var $data    = $.extend(false, $defEntity, $entity);
+            $data.widget = $widgetname; // widget name
+            $data.uid    = $widgetId;   // widget uid
+
+            $.ajaxq('widgetizer', {
+                url     : $.fn.widgetizerDrop.restUrl,
+                type    : 'POST',
+                data    : $data,
+                success : function (response) {
+                    alert('Save Successfull.');
+                },
+                error   : function (response) {
+                    alert('Error!!');
+                }
+            });
+        }
     }
+
+    // set from management-template
+    $.fn.widgetizerDrop.restUrl = '';
 
     // =======================================================================================================================================
 

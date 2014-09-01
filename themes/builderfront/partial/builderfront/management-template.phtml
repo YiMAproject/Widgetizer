@@ -17,6 +17,26 @@ $this->inlineScript()
     ->appendFile($this->basePath().'/builderfront/js/jquery.ui.touch-punch.min.js')
     ->appendFile($this->basePath().'/builderfront/js/main.js')
 ;
+// set widgets rest api service
+$restUrl = $this->url(
+    \yimaAdminor\Module::ADMIN_DEFAULT_ROUTE_NAME,
+    array(
+        'module'     => 'Widgetizer',
+        'controller' => 'WidgetManagementRest',
+        'action'     => '', // disable default action, using rest call instead
+    )
+);
+$this->inlineScript()
+    ->captureStart();
+?>
+// <script>
+    (function($){
+        $.fn.widgetizerDrop.restUrl = '<?php echo $restUrl ?>';
+    })(jQuery);
+// </script>
+<?php
+$this->inlineScript()
+    ->captureEnd();
 
 $this->headLink()
     ->appendStylesheet($this->basePath().'/builderfront/css/style.css')
