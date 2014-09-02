@@ -25,6 +25,11 @@
     $(window).load(function() {
         makeDraggable();
         makeSortable();
+
+        $('.builderfront_widget_holder.ui_sortable_element').each(function(){
+            $.fn.widgetizerDrop.decorateWidgets($(this));
+        });
+
     });
 
     function makeDraggable()
@@ -236,47 +241,12 @@
             saveWidget($wuid, $wname, $area);
 
             // append widget extra elements
-            appendSortableHandler(element);
-            appendSettingButtons(element);
-
-            $('.builderfront_settings_item').bind( 'click', function() {
-                var $action = $(this).attr('data-anchor');
-                if ($action == 'remove') {
-                    var $placeholder = $(this).closest('.ui-sortable');
-                    // first remove widget
-                    $(this).closest('.builderfront_widget_holder').remove();
-                    // revert to place holder default
-                    _downlightPlaceholder($placeholder);
-                }
-            });
+            $.fn.widgetizerDrop.decorateWidgets(element);
         };
 
         $($widgetHolder).widgetator(options, $callback); // <== LOAD WIDGET
 
         // __________________________________________________________________________________
-
-        function appendSortableHandler(element) {
-            var $handler = $('<div></div>').addClass(AREA_SORTABLE_HANDLER_CLAS);
-                var $icon = $('<span class="fa fa-arrows  white"></span>');
-            $handler.html($icon);
-
-            element.append($handler);
-        }
-
-        // append widget setting buttons elements
-        function appendSettingButtons(element) {
-            var $settingContainer = $('<div></div>').addClass('builderfront_settings');
-            var $delButton = $('<button type="button" data-anchor="remove"><span class="fa fa-trash-o  white"></span></button>');
-            $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
-            var $editButton = $('<button type="button" data-anchor=""><span class="fa fa-pencil  white"></span></button>');
-            $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');
-
-            $settingContainer
-                .append($editButton)
-                .append($delButton)
-            ;
-            element.append($settingContainer);
-        }
 
         /**
          * Save widget into db
@@ -309,7 +279,48 @@
                 }
             });
         }
-    }
+    };
+
+    $.fn.widgetizerDrop.decorateWidgets = function(element)
+    {
+        appendSortableHandler(element);
+        appendSettingButtons(element);
+
+        $('.builderfront_settings_item').bind( 'click', function() {
+            var $action = $(this).attr('data-anchor');
+            if ($action == 'remove') {
+                var $placeholder = $(this).closest('.ui-sortable');
+                // first remove widget
+                $(this).closest('.builderfront_widget_holder').remove();
+                // revert to place holder default
+                _downlightPlaceholder($placeholder);
+            }
+        });
+
+        function appendSortableHandler(element) {
+            var $handler = $('<div></div>').addClass(AREA_SORTABLE_HANDLER_CLAS);
+            var $icon = $('<span class="fa fa-arrows  white"></span>');
+            $handler.html($icon);
+
+            element.append($handler);
+        }
+
+        // append widget setting buttons elements
+        function appendSettingButtons(element) {
+            var $settingContainer = $('<div></div>').addClass('builderfront_settings');
+            var $delButton = $('<button type="button" data-anchor="remove"><span class="fa fa-trash-o  white"></span></button>');
+            $delButton.addClass('builderfront_settings_item builderfront_btn btn-danger');
+            /*var $editButton = $('<button type="button" data-anchor=""><span class="fa fa-pencil  white"></span></button>');
+            $editButton.addClass('builderfront_settings_item builderfront_btn btn-success');*/
+
+            $settingContainer
+                //.append($editButton)
+                .append($delButton)
+            ;
+            element.append($settingContainer);
+        }
+
+    };
 
     // set from management-template
     $.fn.widgetizerDrop.restUrl = '';

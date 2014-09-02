@@ -1,13 +1,15 @@
 <?php
 /**
- * @var \yimaWidgetator\Widget\Interfaces\WidgetInterface $widget
+ * @var \yimaWidgetator\Widget\AbstractWidget $widget
  */
 ?>
 <!--
     Widgets will decorate for ui management
 -->
 
+<div class="builderfront_widget_holder ui_sortable_element" data-name="" data-id="<?php echo $widget->getUid(); ?>">
     <?php echo $widget->render(); ?>
+</div>
 
 <!--
     / Widgets will decorate for ui management
