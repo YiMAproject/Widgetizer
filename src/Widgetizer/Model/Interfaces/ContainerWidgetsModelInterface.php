@@ -7,15 +7,6 @@ use Zend\Db\ResultSet\ResultSet;
 interface ContainerWidgetsModelInterface
 {
     /**
-     * Insert new entity
-     *
-     * @param ContainerWidgetsEntity $entity
-     *
-     * @return mixed
-     */
-    public function insert(ContainerWidgetsEntity $entity);
-
-    /**
      * Finds widgets by given entity criteria
      *
      * @param ContainerWidgetsEntity $entity Conditions
@@ -26,4 +17,22 @@ interface ContainerWidgetsModelInterface
      * @return ResultSet
      */
     public function find(ContainerWidgetsEntity $entity, $order = 'DESC', $offset = null, $count = null);
+
+    /**
+     * Insert new entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function insert(ContainerWidgetsEntity $entity);
+
+    /**
+     * Delete widget by entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function delete(ContainerWidgetsEntity $entity);
 }

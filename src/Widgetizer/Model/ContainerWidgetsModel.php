@@ -52,18 +52,6 @@ class ContainerWidgetsModel extends AbstractEventModel
     }
 
     /**
-     * Insert new entity
-     *
-     * @param ContainerWidgetsEntity $entity
-     *
-     * @return mixed
-     */
-    public function insert(ContainerWidgetsEntity $entity)
-    {
-        $this->getTableGateway()->insert($entity->getArrayCopy());
-    }
-
-    /**
      * Finds widgets by given entity criteria
      *
      * @param ContainerWidgetsEntity $entity Conditions
@@ -99,5 +87,38 @@ class ContainerWidgetsModel extends AbstractEventModel
         $result = $this->getTableGateway()->selectWith($select);
 
         return $result;
+    }
+
+    /**
+     * Insert new entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function insert(ContainerWidgetsEntity $entity)
+    {
+        $this->getTableGateway()->insert($entity->getArrayCopy());
+    }
+
+    /**
+     * Delete widget by entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function delete(ContainerWidgetsEntity $entity)
+    {
+        $where = $entity->getArrayCopy();
+        unset($where[ContainerWidgetsEntity::ORDER]); // order not important to remove
+        foreach($where as $f => $v) {
+            if ($v === null) {
+                // remove null fields
+                unset($where[$f]);
+            }
+        }
+
+        $this->getTableGateway()->delete($where);
     }
 }

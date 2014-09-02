@@ -108,16 +108,12 @@ class WidgetModel extends AbstractEventModel
      */
     public function delete(WidgetEntity $widgetEntity)
     {
-        $ev = $widgetEntity->get(WidgetEntity::WIDGET_ID);
-        if ($ev) {
-            $where = array(WidgetEntity::WIDGET_ID => $ev);
-        } else {
-            $ev = $widgetEntity->get(WidgetEntity::UID);
-            if (!$ev) {
-                throw new \Exception('Entity Widget Must Contains "widget_id" or "uid" to delete.');
+        $where = $widgetEntity->getArrayCopy();
+        foreach($where as $f => $v) {
+            if ($v === null) {
+                // remove null fields
+                unset($where[$f]);
             }
-
-            $where = array(WidgetEntity::UID => $ev);
         }
 
         $this->getTableGateway()->delete($where);

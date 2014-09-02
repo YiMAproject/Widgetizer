@@ -290,10 +290,24 @@
             var $action = $(this).attr('data-anchor');
             if ($action == 'remove') {
                 var $placeholder = $(this).closest('.ui-sortable');
-                // first remove widget
-                $(this).closest('.builderfront_widget_holder').remove();
-                // revert to place holder default
-                _downlightPlaceholder($placeholder);
+                var $widget = $(this).closest('.builderfront_widget_holder');
+                var $uid = $(this).closest('.builderfront_widget_holder').attr('data-id');
+                $.ajaxq('widgetizer', {
+                    url     : $.fn.widgetizerDrop.restUrl,
+                    type    : 'DELETE',
+                    dataType: 'json',
+                    headers : {uid: $uid},
+                    success : function (response) {
+                        // first remove widget
+                        $widget.remove();
+                        // revert to place holder default
+                        _downlightPlaceholder($placeholder);
+                    },
+                    error   : function (response) {
+                        alert('Error Delete Widget, Try Again.');
+                        return false;
+                    }
+                });
             }
         });
 

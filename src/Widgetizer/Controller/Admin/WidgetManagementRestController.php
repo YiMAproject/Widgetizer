@@ -17,6 +17,13 @@ class WidgetManagementRestController extends AbstractRestfulController
     const REST_FAILED  = 'rest_failed';
 
     /**
+     * Name of request or query parameter containing identifier
+     *
+     * @var string
+     */
+    protected $identifierName = 'uid';
+
+    /**
      * Create a new resource
      * : called from processPostData
      *
@@ -83,6 +90,97 @@ class WidgetManagementRestController extends AbstractRestfulController
         $response->getHeaders()->addHeader($header);
 
         return $response;
+    }
+
+    /**
+     * Delete an existing resource
+     *
+     * @param  string $uid Widget UID
+     *
+     * @return mixed
+     */
+    public function delete($uid)
+    {
+        $exception = false;
+        $message   = null;
+        $result    = self::REST_SUCCESS;
+
+        $sm = $this->getServiceLocator();
+
+        try {
+            /** @var $wm WidgetModel */
+            $wm = $sm->get('Widgetizer.Model.Widget');
+            $wm->delete(new WidgetEntity(
+                array(
+                    WidgetEntity::UID => $uid,
+                )
+            ));
+
+            /** @var $cm ContainerWidgetsModel */
+            $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
+            $cm->delete(new cwEntity(
+                array(
+                    cwEntity::WIDGET_UID => $uid,
+                )
+            ));
+        } catch (\Exception $e)
+        {
+            $exception = true;
+            $message   = $e->getMessage();
+            $result    = self::REST_FAILED;
+
+            $this->response
+                ->setStatusCode(417);
+        }
+
+        // set response
+        $response = $this->response;
+        $response->setContent(Json\Json::encode(
+            array(
+                'exception' => $exception,
+                'message'   => $message,
+                'result'    => $result,
+            )
+        ));
+
+        $header = new \Zend\Http\Header\ContentType();
+        $header->value = 'Application/Json';
+        $response->getHeaders()->addHeader($header);
+
+        return $response;
+    }
+
+    /**
+     * Retrieve the identifier, if any
+     *
+     * Attempts to see if an identifier was passed in either the URI or the
+     * query string, returning it if found. Otherwise, returns a boolean false.
+     *
+     * @param  \Zend\Mvc\Router\RouteMatch       $routeMatch
+     * @param  \Zend\Http\PhpEnvironment\Request $request     Request
+     *
+     * @return false|mixed
+     */
+    protected function getIdentifier($routeMatch, $request)
+    {
+        $identifier = $this->getIdentifierName();
+        $id = $routeMatch->getParam($identifier, false);
+        if ($id !== false) {
+            return $id;
+        }
+
+        $id = $request->getQuery()->get($identifier, false);
+        if ($id !== false) {
+            return $id;
+        }
+
+        // Get Identifier from heads, cause we have scrambled admin uri
+        $header = $request->getHeader($identifier);
+        if ($header) {
+            return $header->getFieldValue();
+        }
+
+        return false;
     }
 
     /**
