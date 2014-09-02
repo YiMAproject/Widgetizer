@@ -52,6 +52,18 @@ class ContainerWidgetsModel extends AbstractEventModel
     }
 
     /**
+     * Insert new entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function insert(ContainerWidgetsEntity $entity)
+    {
+        $this->getTableGateway()->insert($entity->getArrayCopy());
+    }
+
+    /**
      * Finds widgets by given entity criteria
      *
      * @param ContainerWidgetsEntity $entity Conditions

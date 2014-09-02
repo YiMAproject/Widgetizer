@@ -1,8 +1,12 @@
 <?php
 namespace Widgetizer\Controller\Admin;
 
+use Widgetizer\Model\ContainerWidgetsEntity as cwEntity;
+use Widgetizer\Model\ContainerWidgetsModel;
+use Widgetizer\Model\WidgetEntity;
+use Widgetizer\Model\WidgetModel;
+use Widgetizer\Service\PersistStorage;
 use yimaWidgetator\Service;
-use yimaWidgetator\View\Helper\WidgetAjaxy;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Session\Container as SessionContainer;
 use Zend\Json;
@@ -10,40 +14,55 @@ use Zend\Json;
 class WidgetManagementRestController extends AbstractRestfulController
 {
     const REST_SUCCESS = 'rest_success';
+    const REST_FAILED  = 'rest_failed';
 
     /**
      * Create a new resource
+     * : called from processPostData
+     *
+     * - Save widget
      *
      * @param  mixed $data
      * @return mixed
      */
     public function create($data)
     {
-        return $this->proccessData($data);
-    }
-
-    protected function proccessData($data)
-    {
-        $storage = $this->getServiceLocator()->get('Widgetizer.PersistStorage');
-        $storage->setToken($data['token']);
-        d_r($storage->getStorage()->layout);
-        d_e($storage->getStorage()->template);
-
         $exception = false;
-        $message   = self::REST_SUCCESS;
-        $result    = null;
+        $message   = null;
+        $result    = self::REST_SUCCESS;
+
+        $sm = $this->getServiceLocator();
 
         try {
-            // Call Widget
-            $result = $this->processWidget(
-                $this->getValidateData($data)
-            );
-        }
-        catch (\Exception $e)
+            $data = $this->getValidatedPostData($data);
+
+            /** @var $wm WidgetModel */
+            $wm = $sm->get('Widgetizer.Model.Widget');
+            $wm->insert(new WidgetEntity(
+                array(
+                    WidgetEntity::WIDGET => $data['widget'],
+                    WidgetEntity::UID    => $data['uid'],
+                )
+            ));
+
+            /** @var $cm ContainerWidgetsModel */
+            $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
+            $cm->insert(new cwEntity(
+                array(
+                    cwEntity::TEMPLATE          => $data['template'],
+                    cwEntity::TEMPLATE_LAYOUT   => $data['layout'],
+                    cwEntity::TEMPLATE_AREA     => $data['area'],
+                    cwEntity::ROUTE_NAME        => $data['route'],
+                    cwEntity::IDENTIFIER_PARAMS => $data['identifier'],
+                    cwEntity::WIDGET_UID        => $data['uid'],
+                    cwEntity::ORDER             => 5,
+                )
+            ));
+        } catch (\Exception $e)
         {
             $exception = true;
-            $message   = get_class($e);
-            $result    = $e->getMessage();
+            $message   = $e->getMessage();
+            $result    = self::REST_FAILED;
 
             $this->response
                 ->setStatusCode(417);
@@ -51,7 +70,8 @@ class WidgetManagementRestController extends AbstractRestfulController
 
         // set response
         $response = $this->response;
-        $response->setContent(Json\Json::encode(array(
+        $response->setContent(Json\Json::encode(
+            array(
                 'exception' => $exception,
                 'message'   => $message,
                 'result'    => $result,
@@ -66,69 +86,37 @@ class WidgetManagementRestController extends AbstractRestfulController
     }
 
     /**
-     * Validate Data
+     * Validate and made Data
      *
-     * @param array $data Data
+     * @param array $data Post Data
      *
      * @return array
-     *
-     * @throws \yimaWidgetator\Service\Exceptions\UnauthorizedException
-     * @throws \yimaWidgetator\Service\Exceptions\InvalidArgumentException
      */
-    protected function getValidateData($data)
+    public function getValidatedPostData(array $data)
     {
-        if (!isset($data['widget'])) {
-            // : Widget Name
-            throw new Service\Exceptions\InvalidArgumentException('{widget} param is absent.');
+        // Check against needed data >>>>>>
+        $keyData = array(
+            'token',
+            'uid',
+            'widget',
+            'area',
+        );
+
+        if (array_diff($keyData, array_keys($data))) {
+            throw new \InvalidArgumentException('Invalid request data provided.');
         }
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-        if (!isset($data['method'])) {
-            // : Method must call from widget
-            throw new Service\Exceptions\InvalidArgumentException('{method} param is absent.');
-        }
+        // Get Data From Persist Storage
+        $sm = $this->getServiceLocator();
+        /** @var $storage PersistStorage */
+        $storage = $sm->get('Widgetizer.PersistStorage');
+        $storage->setToken($data['token']);
 
-        $params = array();
-        if(isset($data['params'])) {
-            // : Params that constructed widget
-            if (is_array($data['params'])) {
-                // ajaxq send object as array here
-                $params = $data['params'];
-            } else {
-                $params = Json\Json::decode($data['params']);
-            }
-        }
-        $data['params'] = $params;
-
-        $data['interfunc'] = isset($data['interfunc']) ? $data['interfunc'] : array();
-        $interfunc = $data['interfunc'];
-        $interfunc = explode(';', $interfunc);
-        $data['interfunc'] = array();
-        foreach($interfunc as $if) {
-            // key:value, value returned from (method) will returned as (key) in last result
-            // call a method and append returned value to result array
-            $if = explode(':', $if);
-            if (count($if) > 2 || count($if) < 2)
-                throw new Service\Exceptions\InvalidArgumentException('{interfunc} param is invalid.');
-            $data['interfunc'][] = $if;
-        }
-
-        if (!$this->request->isXmlHttpRequest()) {
-            // No Token Needed for ajax requests
-            if (!isset($params['request_token'])) {
-                throw new Service\Exceptions\UnauthorizedException('{request_token} param is absent.');
-            } else {
-                // validate token
-                $token = $params['request_token'];
-
-                $sesCont = new SessionContainer(WidgetAjaxy::SESSION_KEY);
-                if (!$sesCont->offsetGet($token)) {
-                    // invalid token
-                    throw new Service\Exceptions\UnauthorizedException('{request_token} is mismatch.');
-                }
-
-                unset($params['request_token']);
-            }
-        }
+        $data['template']   = $storage->getTemplate();
+        $data['layout']     = $storage->getLayout();
+        $data['route']      = $storage->getRoute();
+        $data['identifier'] = $storage->getIdentifier();
 
         return $data;
     }

@@ -23,7 +23,7 @@ class PersistStorage
     protected $token;
 
     /**
-     * Set Template
+     * Set Current Template
      *
      * @param string $template Template
      *
@@ -36,8 +36,13 @@ class PersistStorage
         return $this;
     }
 
+    public function getTemplate()
+    {
+        return $this->getStorage()->template;
+    }
+
     /**
-     * Set Layout
+     * Set Current Layout
      *
      * @param string $layout Layout
      *
@@ -50,18 +55,47 @@ class PersistStorage
         return $this;
     }
 
+    public function getLayout()
+    {
+        return $this->getStorage()->layout;
+    }
+
+    /**
+     * Set Current Route Name
+     *
+     * @param string $route Route Name
+     *
+     * @return $this
+     */
     public function setRoute($route)
     {
-        /** @TODO */
+        $this->getStorage()->route = $route;
 
         return $this;
     }
 
+    public function getRoute()
+    {
+        return $this->getStorage()->route;
+    }
+
+    /**
+     * Set Identifier
+     *
+     * @param string $identifier Specific Identifier
+     *
+     * @return $this
+     */
     public function setIdentifier($identifier)
     {
-        /** @TODO */
+        $this->getStorage()->identifier = $identifier;
 
         return $this;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->getStorage()->identifier;
     }
 
     /**

@@ -7,6 +7,15 @@ use Zend\Db\ResultSet\ResultSet;
 interface ContainerWidgetsModelInterface
 {
     /**
+     * Insert new entity
+     *
+     * @param ContainerWidgetsEntity $entity
+     *
+     * @return mixed
+     */
+    public function insert(ContainerWidgetsEntity $entity);
+
+    /**
      * Finds widgets by given entity criteria
      *
      * @param ContainerWidgetsEntity $entity Conditions
