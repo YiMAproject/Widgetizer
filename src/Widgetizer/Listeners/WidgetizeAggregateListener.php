@@ -58,20 +58,20 @@ class WidgetizeAggregateListener extends ParentalShare implements
      * - Set Template and Layout in Storage
      *
      * @param MvcEvent $e Event
-     *
-     * @return bool
+     * 
      */
     public function onRenderCreateStorage(MvcEvent $e)
     {
         $viewModel = $e->getViewModel();
         if (! $viewModel instanceof ThemeDefaultInterface) {
-            return false;
+            return;
         }
 
         $sm = $e->getApplication()->getServiceManager();
         $storage = $sm->get('Widgetizer.PersistStorage');
         $storage->setTemplate($viewModel->getName());
         $storage->setLayout($viewModel->getTemplate());
+        $storage->setRoute($e->getRouteMatch()->getMatchedRouteName());
     }
 
     /**
