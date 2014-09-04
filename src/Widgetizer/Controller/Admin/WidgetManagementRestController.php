@@ -62,7 +62,7 @@ class WidgetManagementRestController extends AbstractRestfulController
                     cwEntity::ROUTE_NAME        => $data['route'],
                     cwEntity::IDENTIFIER_PARAMS => $data['identifier'],
                     cwEntity::WIDGET_UID        => $data['uid'],
-                    cwEntity::ORDER             => 5,
+                    cwEntity::ORDER             => $data['order'],
                 )
             ));
         } catch (\Exception $e)

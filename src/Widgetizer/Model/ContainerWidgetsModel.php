@@ -6,7 +6,6 @@ use Widgetizer\Model\TableGateway\ContainerWidgetsTable;
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
 use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\Sql\Select;
 use Zend\ServiceManager\ServiceManager;
 use Widgetizer\Model\TableGateway\WidgetTable;
 
@@ -73,6 +72,9 @@ class ContainerWidgetsModel extends AbstractEventModel
             $conditions[$key] = $val;
         }
 
+        // just not important
+        unset($conditions[$entity::ORDER]);
+
         $select = $this->getTableGateway()->getSql()
             ->select()
             ->where($conditions)
@@ -98,6 +100,41 @@ class ContainerWidgetsModel extends AbstractEventModel
      */
     public function insert(ContainerWidgetsEntity $entity)
     {
+        $inc_order = function (&$order)
+        {
+            $order = ($order < 0) ? 0 : $order;
+            $order ++;
+            $order *= 5;
+        };
+
+        $order = $entity->get($entity::ORDER);
+        $inc_order($order);
+
+        $entity->set($entity::ORDER, $order);
+
+        // shift other widgets order to next ----------------------------------\
+        $where = function(\Zend\Db\Sql\Select $select) use ($entity, $order) {
+            $select->where
+                ->greaterThanOrEqualTo($entity::ORDER, $order)
+                ->equalTo($entity::TEMPLATE,          $entity->get($entity::TEMPLATE))
+                ->equalTo($entity::TEMPLATE_LAYOUT,   $entity->get($entity::TEMPLATE_LAYOUT))
+                ->equalTo($entity::TEMPLATE_AREA,     $entity->get($entity::TEMPLATE_AREA))
+                ->equalTo($entity::ROUTE_NAME,        $entity->get($entity::ROUTE_NAME))
+                ->equalTo($entity::IDENTIFIER_PARAMS, $entity->get($entity::IDENTIFIER_PARAMS))
+            ;
+        };
+
+        $rs = $this->getTableGateway()->select($where);
+        /** @var $r ContainerWidgetsEntity */
+        foreach ($rs as $r) {
+            $eOrder = $r->get($entity::ORDER);
+            $this->getTableGateway()->update(
+                array($entity::ORDER => $eOrder + 5)
+               ,array($entity::WIDGET_UID => $r->get($entity::WIDGET_UID))
+            );
+        }
+
+        // insert widget ------------------------------------------------------\
         $this->getTableGateway()->insert($entity->getArrayCopy());
     }
 

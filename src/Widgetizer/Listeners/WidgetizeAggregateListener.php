@@ -58,7 +58,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
      * - Set Template and Layout in Storage
      *
      * @param MvcEvent $e Event
-     * 
+     *
      */
     public function onRenderCreateStorage(MvcEvent $e)
     {
