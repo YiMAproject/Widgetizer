@@ -28,6 +28,11 @@ class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
     );
 
     /**
+     * Default value for empty entity value
+     */
+    protected static $defaultEmptyValue = '';
+
+    /**
      * Strict from unwanted attributes
      *
      * @var bool Strict Mode

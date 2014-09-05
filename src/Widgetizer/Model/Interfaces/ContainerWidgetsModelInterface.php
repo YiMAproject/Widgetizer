@@ -19,6 +19,16 @@ interface ContainerWidgetsModelInterface
     public function find(ContainerWidgetsEntity $entity, $order = 'DESC', $offset = null, $count = null);
 
     /**
+     * Change Entity Order and Shift Elements Orders
+     *
+     * @param ContainerWidgetsEntity $entity Entity Object
+     * @param int                    $order  Order
+     *
+     * @return mixed
+     */
+    public function changeOrder(ContainerWidgetsEntity $entity, $order);
+
+    /**
      * Insert new entity
      *
      * @param ContainerWidgetsEntity $entity

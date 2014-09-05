@@ -93,6 +93,58 @@ class WidgetManagementRestController extends AbstractRestfulController
     }
 
     /**
+     * Update an existing resource
+     *
+     * @param int $id   Widget uid
+     * @param int $data New Values
+     *
+     * @return mixed
+     */
+    public function update($id, $data)
+    {
+        $exception = false;
+        $message   = null;
+        $result    = self::REST_SUCCESS;
+
+        $sm = $this->getServiceLocator();
+
+        try {
+            $data = $this->getValidatedPutData($data);
+
+            /** @var $cm ContainerWidgetsModel */
+            $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
+            $cm->changeOrder(
+                new cwEntity(array(cwEntity::WIDGET_UID => $id))
+               ,$data['order']
+            );
+        } catch (\Exception $e)
+        {
+            $exception = true;
+            $message   = $e->getMessage();
+            $result    = self::REST_FAILED;
+
+            $this->response
+                ->setStatusCode(417);
+        }
+
+        // set response
+        $response = $this->response;
+        $response->setContent(Json\Json::encode(
+            array(
+                'exception' => $exception,
+                'message'   => $message,
+                'result'    => $result,
+            )
+        ));
+
+        $header = new \Zend\Http\Header\ContentType();
+        $header->value = 'Application/Json';
+        $response->getHeaders()->addHeader($header);
+
+        return $response;
+    }
+
+    /**
      * Delete an existing resource
      *
      * @param  string $uid Widget UID
@@ -215,6 +267,27 @@ class WidgetManagementRestController extends AbstractRestfulController
         $data['layout']     = $storage->getLayout();
         $data['route']      = $storage->getRoute();
         $data['identifier'] = $storage->getIdentifier();
+
+        return $data;
+    }
+
+    /**
+     * Validate and made Data
+     *
+     * @param array $data Put Data
+     *
+     * @return array
+     */
+    public function getValidatedPutData(array $data)
+    {
+        // Data that can be changed >>>>>>
+        $keyData = array(
+            'order',
+        );
+        if (!array_intersect($keyData, array_keys($data))) {
+            throw new \InvalidArgumentException('Invalid request data provided.');
+        }
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         return $data;
     }

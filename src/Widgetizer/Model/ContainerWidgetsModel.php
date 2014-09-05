@@ -78,7 +78,7 @@ class ContainerWidgetsModel extends AbstractEventModel
         $select = $this->getTableGateway()->getSql()
             ->select()
             ->where($conditions)
-            ->order(ContainerWidgetsEntity::CONTAINER_ID.' '.$order)
+            ->order(ContainerWidgetsEntity::ORDER.' '.$order)
         ;
 
         if ($offset)
@@ -92,6 +92,40 @@ class ContainerWidgetsModel extends AbstractEventModel
     }
 
     /**
+     * Change Entity Order and Shift Elements Orders
+     *
+     * @param ContainerWidgetsEntity $entity Entity Object
+     * @param int $order Order
+     *
+     * @return mixed
+     */
+    public function changeOrder(ContainerWidgetsEntity $entity, $order)
+    {
+        $inc_order = function (&$order) {
+            $order = ($order < 0) ? 0 : $order;
+            $order ++;
+            $order *= 5;
+        };
+        $inc_order($order);
+
+        // Shift other Entities down
+        $entity->set($entity::ORDER, $order);
+        $this->reorder($entity, 1);
+
+        // Set new order -----------------------------------------------------------\
+        $where = $entity->getArrayCopy();
+        unset($where[$entity::ORDER]);
+        foreach($where as $f => $v) {
+            if ($v === $entity::getDefaultEmptyValue()) {
+                // remove null fields
+                unset($where[$f]);
+            }
+        }
+
+        $this->getTableGateway()->update(array($entity::ORDER => $order), $where);
+    }
+
+    /**
      * Insert new entity
      *
      * @param ContainerWidgetsEntity $entity
@@ -100,39 +134,18 @@ class ContainerWidgetsModel extends AbstractEventModel
      */
     public function insert(ContainerWidgetsEntity $entity)
     {
-        $inc_order = function (&$order)
-        {
+        $order = $entity->get($entity::ORDER);
+
+        $inc_order = function (&$order) {
             $order = ($order < 0) ? 0 : $order;
             $order ++;
             $order *= 5;
         };
-
-        $order = $entity->get($entity::ORDER);
         $inc_order($order);
 
+        // Shift other Entities down
         $entity->set($entity::ORDER, $order);
-
-        // shift other widgets order to next ----------------------------------\
-        $where = function(\Zend\Db\Sql\Select $select) use ($entity, $order) {
-            $select->where
-                ->greaterThanOrEqualTo($entity::ORDER, $order)
-                ->equalTo($entity::TEMPLATE,          $entity->get($entity::TEMPLATE))
-                ->equalTo($entity::TEMPLATE_LAYOUT,   $entity->get($entity::TEMPLATE_LAYOUT))
-                ->equalTo($entity::TEMPLATE_AREA,     $entity->get($entity::TEMPLATE_AREA))
-                ->equalTo($entity::ROUTE_NAME,        $entity->get($entity::ROUTE_NAME))
-                ->equalTo($entity::IDENTIFIER_PARAMS, $entity->get($entity::IDENTIFIER_PARAMS))
-            ;
-        };
-
-        $rs = $this->getTableGateway()->select($where);
-        /** @var $r ContainerWidgetsEntity */
-        foreach ($rs as $r) {
-            $eOrder = $r->get($entity::ORDER);
-            $this->getTableGateway()->update(
-                array($entity::ORDER => $eOrder + 5)
-               ,array($entity::WIDGET_UID => $r->get($entity::WIDGET_UID))
-            );
-        }
+        $this->reorder($entity, 1);
 
         // insert widget ------------------------------------------------------\
         $this->getTableGateway()->insert($entity->getArrayCopy());
@@ -147,15 +160,52 @@ class ContainerWidgetsModel extends AbstractEventModel
      */
     public function delete(ContainerWidgetsEntity $entity)
     {
+        $rs = $this->find($entity);
+        foreach ($rs as $e) {
+            // Shift other Entities up
+            $this->reorder($e, -1);
+        }
+
         $where = $entity->getArrayCopy();
         unset($where[ContainerWidgetsEntity::ORDER]); // order not important to remove
         foreach($where as $f => $v) {
-            if ($v === null) {
+            if ($v === $entity::getDefaultEmptyValue()) {
                 // remove null fields
                 unset($where[$f]);
             }
         }
 
         $this->getTableGateway()->delete($where);
+    }
+
+    protected function reorder(ContainerWidgetsEntity $entity, $flag)
+    {
+        $order = $entity->get($entity::ORDER);
+
+        $newOrder = 5 * $flag;
+        $entities = $this->find($entity);
+        foreach($entities as $e) {
+            $wc = function(\Zend\Db\Sql\Select $select) use ($e, $order) {
+                $select->where
+                    ->greaterThanOrEqualTo($e::ORDER, $order)
+                    ->equalTo($e::TEMPLATE,          $e->get($e::TEMPLATE))
+                    ->equalTo($e::TEMPLATE_LAYOUT,   $e->get($e::TEMPLATE_LAYOUT))
+                    ->equalTo($e::TEMPLATE_AREA,     $e->get($e::TEMPLATE_AREA))
+                    ->equalTo($e::ROUTE_NAME,        $e->get($e::ROUTE_NAME))
+                    ->equalTo($e::IDENTIFIER_PARAMS, $e->get($e::IDENTIFIER_PARAMS))
+                ;
+            };
+
+            $rs = $this->getTableGateway()->select($wc);
+
+            /** @var $r ContainerWidgetsEntity */
+            foreach ($rs as $r) {
+                $eOrder = $r->get($e::ORDER);
+                $this->getTableGateway()->update(
+                    array($e::ORDER => $eOrder + $newOrder)
+                    ,array($e::WIDGET_UID => $r->get($e::WIDGET_UID))
+                );
+            }
+        }
     }
 }
