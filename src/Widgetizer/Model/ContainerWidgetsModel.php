@@ -59,7 +59,7 @@ class ContainerWidgetsModel extends AbstractEventModel
      *
      * @return ResultSet
      */
-    public function find(ContainerWidgetsEntity $entity, $order = 'DESC', $offset = null, $count = null)
+    public function find(ContainerWidgetsEntity $entity, $order = 'ASC', $offset = null, $count = null)
     {
         $order = ($order) ?: 'DESC';
 
@@ -107,10 +107,7 @@ class ContainerWidgetsModel extends AbstractEventModel
             $order *= 5;
         };
         $inc_order($order);
-
-        // Shift other Entities down
         $entity->set($entity::ORDER, $order);
-        $this->reorder($entity, 1);
 
         // Set new order -----------------------------------------------------------\
         $where = $entity->getArrayCopy();
@@ -123,6 +120,9 @@ class ContainerWidgetsModel extends AbstractEventModel
         }
 
         $this->getTableGateway()->update(array($entity::ORDER => $order), $where);
+
+        // Shift other Entities down
+        $this->reorder($entity, 1);
     }
 
     /**
@@ -142,13 +142,13 @@ class ContainerWidgetsModel extends AbstractEventModel
             $order *= 5;
         };
         $inc_order($order);
-
-        // Shift other Entities down
         $entity->set($entity::ORDER, $order);
-        $this->reorder($entity, 1);
 
         // insert widget ------------------------------------------------------\
         $this->getTableGateway()->insert($entity->getArrayCopy());
+
+        // Shift other Entities down
+        $this->reorder($entity, 1);
     }
 
     /**
@@ -160,11 +160,8 @@ class ContainerWidgetsModel extends AbstractEventModel
      */
     public function delete(ContainerWidgetsEntity $entity)
     {
-        $rs = $this->find($entity);
-        foreach ($rs as $e) {
-            // Shift other Entities up
-            $this->reorder($e, -1);
-        }
+        // Shift other Entities up
+        $this->reorder($entity, -1);
 
         $where = $entity->getArrayCopy();
         unset($where[ContainerWidgetsEntity::ORDER]); // order not important to remove
@@ -180,12 +177,13 @@ class ContainerWidgetsModel extends AbstractEventModel
 
     protected function reorder(ContainerWidgetsEntity $entity, $flag)
     {
-        $order = $entity->get($entity::ORDER);
-
         $newOrder = 5 * $flag;
         $entities = $this->find($entity);
+        /** @var $e ContainerWidgetsEntity */
         foreach($entities as $e) {
-            $wc = function(\Zend\Db\Sql\Select $select) use ($e, $order) {
+            $order = $e->get($entity::ORDER);
+
+            $wc = function(\Zend\Db\Sql\Select $select) use ($e, $entity, $order) {
                 $select->where
                     ->greaterThanOrEqualTo($e::ORDER, $order)
                     ->equalTo($e::TEMPLATE,          $e->get($e::TEMPLATE))
@@ -193,6 +191,8 @@ class ContainerWidgetsModel extends AbstractEventModel
                     ->equalTo($e::TEMPLATE_AREA,     $e->get($e::TEMPLATE_AREA))
                     ->equalTo($e::ROUTE_NAME,        $e->get($e::ROUTE_NAME))
                     ->equalTo($e::IDENTIFIER_PARAMS, $e->get($e::IDENTIFIER_PARAMS))
+
+                    ->notEqualTo($e::WIDGET_UID, $entity->get($e::WIDGET_UID))
                 ;
             };
 
