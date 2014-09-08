@@ -1,13 +1,13 @@
 <?php
-namespace Widgetizer\Model;
+namespace Widgetizer\Model\Container;
 
-use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
-use Widgetizer\Model\TableGateway\ContainerWidgetsTable;
+use Widgetizer\Model\Container;
+use Widgetizer\Model\ContainerInterface;
+use Widgetizer\Model\Container\TableGateway\ContainerTable;
 use yimaBase\Model\AbstractEventModel;
 use yimaBase\Model\TableGatewayProviderInterface;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\ServiceManager\ServiceManager;
-use Widgetizer\Model\TableGateway\WidgetTable;
 
 /**
  * Class ContainerWidgetsModel
@@ -15,13 +15,13 @@ use Widgetizer\Model\TableGateway\WidgetTable;
  *
  * @package Widgetizer\Model
  */
-class ContainerWidgetsModel extends AbstractEventModel
+class Model extends AbstractEventModel
     implements
-    ContainerWidgetsModelInterface,
+    ContainerInterface,
     TableGatewayProviderInterface
 {
     /**
-     * @var  WidgetTable Gateway
+     * @var ContainerTable Gateway
      */
     protected $tableGateway;
 
@@ -33,12 +33,12 @@ class ContainerWidgetsModel extends AbstractEventModel
     /**
      * Get TableGateway
      *
-     * @return WidgetTable
+     * @return ContainerTable
      */
     public function getTableGateway()
     {
         if (!$this->tableGateway) {
-            $tableGateway = new ContainerWidgetsTable();
+            $tableGateway = new ContainerTable();
             $this->tableGateway = $tableGateway;
         }
 
@@ -53,20 +53,21 @@ class ContainerWidgetsModel extends AbstractEventModel
     /**
      * Finds widgets by given entity criteria
      *
-     * @param ContainerWidgetsEntity $entity Conditions
+     * @param Container $entity Conditions
+     * @param string $order
      * @param int $offset Offset
      * @param int $count Count
      *
      * @return ResultSet
      */
-    public function find(ContainerWidgetsEntity $entity, $order = 'ASC', $offset = null, $count = null)
+    public function find(Container $entity, $order = 'ASC', $offset = null, $count = null)
     {
         $order = ($order) ?: 'DESC';
 
         // create criteria condition from Entity
         $conditions = array();
         foreach ($entity as $key => $val) {
-            if ($val === ContainerWidgetsEntity::getDefaultEmptyValue())
+            if ($val === Container::getDefaultEmptyValue())
                 continue;
 
             $conditions[$key] = $val;
@@ -78,7 +79,7 @@ class ContainerWidgetsModel extends AbstractEventModel
         $select = $this->getTableGateway()->getSql()
             ->select()
             ->where($conditions)
-            ->order(ContainerWidgetsEntity::ORDER.' '.$order)
+            ->order(Container::ORDER.' '.$order)
         ;
 
         if ($offset)
@@ -94,12 +95,12 @@ class ContainerWidgetsModel extends AbstractEventModel
     /**
      * Change Entity Order and Shift Elements Orders
      *
-     * @param ContainerWidgetsEntity $entity Entity Object
+     * @param Container $entity Entity Object
      * @param int $order Order
      *
      * @return mixed
      */
-    public function changeOrder(ContainerWidgetsEntity $entity, $order)
+    public function changeOrder(Container $entity, $order)
     {
         $inc_order = function (&$order) {
             $order = ($order < 0) ? 0 : $order;
@@ -128,11 +129,11 @@ class ContainerWidgetsModel extends AbstractEventModel
     /**
      * Insert new entity
      *
-     * @param ContainerWidgetsEntity $entity
+     * @param Container $entity
      *
      * @return mixed
      */
-    public function insert(ContainerWidgetsEntity $entity)
+    public function insert(Container $entity)
     {
         $order = $entity->get($entity::ORDER);
 
@@ -154,17 +155,17 @@ class ContainerWidgetsModel extends AbstractEventModel
     /**
      * Delete widget by entity
      *
-     * @param ContainerWidgetsEntity $entity
+     * @param Container $entity
      *
      * @return mixed
      */
-    public function delete(ContainerWidgetsEntity $entity)
+    public function delete(Container $entity)
     {
         // Shift other Entities up
         $this->reorder($entity, -1);
 
         $where = $entity->getArrayCopy();
-        unset($where[ContainerWidgetsEntity::ORDER]); // order not important to remove
+        unset($where[Container::ORDER]); // order not important to remove
         foreach($where as $f => $v) {
             if ($v === $entity::getDefaultEmptyValue()) {
                 // remove null fields
@@ -175,11 +176,11 @@ class ContainerWidgetsModel extends AbstractEventModel
         $this->getTableGateway()->delete($where);
     }
 
-    protected function reorder(ContainerWidgetsEntity $entity, $flag)
+    protected function reorder(Container $entity, $flag)
     {
         $newOrder = 5 * $flag;
         $entities = $this->find($entity);
-        /** @var $e ContainerWidgetsEntity */
+        /** @var $e Container */
         foreach($entities as $e) {
             $order = $e->get($entity::ORDER);
 
@@ -198,7 +199,7 @@ class ContainerWidgetsModel extends AbstractEventModel
 
             $rs = $this->getTableGateway()->select($wc);
 
-            /** @var $r ContainerWidgetsEntity */
+            /** @var $r Container */
             foreach ($rs as $r) {
                 $eOrder = $r->get($e::ORDER);
                 $this->getTableGateway()->update(

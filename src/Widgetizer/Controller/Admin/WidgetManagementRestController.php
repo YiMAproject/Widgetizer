@@ -1,10 +1,10 @@
 <?php
 namespace Widgetizer\Controller\Admin;
 
-use Widgetizer\Model\ContainerWidgetsEntity as cwEntity;
-use Widgetizer\Model\ContainerWidgetsModel;
-use Widgetizer\Model\WidgetEntity;
-use Widgetizer\Model\WidgetModel;
+use Widgetizer\Model\Container as cwEntity;
+use Widgetizer\Model\Model;
+use Widgetizer\Model\Entity;
+use Widgetizer\Model\Model;
 use Widgetizer\Service\PersistStorage;
 use yimaWidgetator\Service;
 use Zend\Mvc\Controller\AbstractRestfulController;
@@ -43,16 +43,16 @@ class WidgetManagementRestController extends AbstractRestfulController
         try {
             $data = $this->getValidatedPostData($data);
 
-            /** @var $wm WidgetModel */
+            /** @var $wm Model */
             $wm = $sm->get('Widgetizer.Model.Widget');
-            $wm->insert(new WidgetEntity(
+            $wm->insert(new Entity(
                 array(
-                    WidgetEntity::WIDGET => $data['widget'],
-                    WidgetEntity::UID    => $data['uid'],
+                    Entity::WIDGET => $data['widget'],
+                    Entity::UID    => $data['uid'],
                 )
             ));
 
-            /** @var $cm ContainerWidgetsModel */
+            /** @var $cm Model */
             $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
             $cm->insert(new cwEntity(
                 array(
@@ -111,7 +111,7 @@ class WidgetManagementRestController extends AbstractRestfulController
         try {
             $data = $this->getValidatedPutData($data);
 
-            /** @var $cm ContainerWidgetsModel */
+            /** @var $cm Model */
             $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
             $cm->changeOrder(
                 new cwEntity(array(cwEntity::WIDGET_UID => $id))
@@ -160,15 +160,15 @@ class WidgetManagementRestController extends AbstractRestfulController
         $sm = $this->getServiceLocator();
 
         try {
-            /** @var $wm WidgetModel */
+            /** @var $wm Model */
             $wm = $sm->get('Widgetizer.Model.Widget');
-            $wm->delete(new WidgetEntity(
+            $wm->delete(new Entity(
                 array(
-                    WidgetEntity::UID => $uid,
+                    Entity::UID => $uid,
                 )
             ));
 
-            /** @var $cm ContainerWidgetsModel */
+            /** @var $cm Model */
             $cm = $sm->get('Widgetizer.Model.ContainerWidgets');
             $cm->delete(new cwEntity(
                 array(

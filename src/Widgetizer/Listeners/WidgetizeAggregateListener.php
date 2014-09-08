@@ -1,10 +1,10 @@
 <?php
 namespace Widgetizer\Listeners;
 
-use Widgetizer\Model\ContainerWidgetsEntity as CWE;
-use Widgetizer\Model\Interfaces\ContainerWidgetsModelInterface;
-use Widgetizer\Model\Interfaces\WidgetModelInterface;
-use Widgetizer\Model\WidgetEntity;
+use Widgetizer\Model\Container as CWE;
+use Widgetizer\Model\ContainerInterface;
+use Widgetizer\Model\Widget;
+use Widgetizer\Model\WidgetInterface as WidgetModelInterface;
 use Widgetizer\Service\ParentalShare;
 use Widgetizer\Service\ShareRegistery;
 use yimaTheme\Theme\ThemeDefaultInterface;
@@ -95,7 +95,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
         }
 
         // Get widgets loaded into each area by template and layout ... {
-        /** @var $cntModel ContainerWidgetsModelInterface */
+        /** @var $cntModel ContainerInterface */
         $cntModel = $this->sm->get('Widgetizer.Model.ContainerWidgets');
 
         $criteria = new CWE(array(
@@ -125,9 +125,9 @@ class WidgetizeAggregateListener extends ParentalShare implements
 
         /** @var $widgetModel WidgetModelInterface */
         $widgetModel = $this->sm->get('Widgetizer.Model.Widget');
-        /** @var $w WidgetEntity */
+        /** @var $w Widget */
         $w = $widgetModel->getWidgetByUid( $r->get(CWE::WIDGET_UID) );
-        if (!$w || !$widgetManager->has($w->get(WidgetEntity::WIDGET))) {
+        if (!$w || !$widgetManager->has($w->get(Widget::WIDGET))) {
             // we don't have a widget with this name registered.
             // ...
             return false;
@@ -135,7 +135,7 @@ class WidgetizeAggregateListener extends ParentalShare implements
 
         // get widget from widgetManager by Widget Name Field
         /** @var $widget WidgetInterface */
-        $widget = $widgetManager->get($w->get(WidgetEntity::WIDGET));
+        $widget = $widgetManager->get($w->get(Widget::WIDGET));
         if (method_exists($widget, 'setFromArray')) {
             // load prop. entities into widget
             $widget->setFromArray($w->getArrayCopy());

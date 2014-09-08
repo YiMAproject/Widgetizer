@@ -1,5 +1,5 @@
 <?php
-namespace Widgetizer\Model\TableGateway;
+namespace Widgetizer\Model\Widget\TableGateway;
 
 use yimaBase\Db\TableGateway\AbstractTableGateway;
 

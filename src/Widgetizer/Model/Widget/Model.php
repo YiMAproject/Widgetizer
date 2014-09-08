@@ -1,15 +1,16 @@
 <?php
-namespace Widgetizer\Model;
+namespace Widgetizer\Model\Widget;
 
-use yimaBase\Model\AbstractEventModel;
-use yimaBase\Model\TableGatewayProviderInterface;
+use Widgetizer\Model\Widget;
+use Widgetizer\Model\WidgetInterface;
 use Zend\ServiceManager\ServiceManager;
-use Widgetizer\Model\Interfaces\WidgetModelInterface;
-use Widgetizer\Model\TableGateway\WidgetTable;
+use Widgetizer\Model\Widget\TableGateway\WidgetTable;
+use yimaBase\Model\TableGatewayProviderInterface;
+use yimaBase\Model\AbstractEventModel;
 
-class WidgetModel extends AbstractEventModel
+class Model extends AbstractEventModel
     implements
-    WidgetModelInterface,
+    WidgetInterface,
     TableGatewayProviderInterface
 {
     /**
@@ -51,7 +52,7 @@ class WidgetModel extends AbstractEventModel
      */
     public function getWidgetByUid($uid)
     {
-        $result = $this->getTableGateway()->select(array(WidgetEntity::UID => $uid));
+        $result = $this->getTableGateway()->select(array(Widget::UID => $uid));
         if ($result->count()) {
             $r = $result->current();
 
@@ -64,11 +65,11 @@ class WidgetModel extends AbstractEventModel
     /**
      * Insert new widget entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @return mixed
      */
-    public function insert(WidgetEntity $widgetEntity)
+    public function insert(Widget $widgetEntity)
     {
         $this->getTableGateway()->insert($widgetEntity->getArrayCopy());
     }
@@ -76,23 +77,23 @@ class WidgetModel extends AbstractEventModel
     /**
      * Update an existing widget by entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @throws \Exception
      * @return mixed
      */
-    public function update(WidgetEntity $widgetEntity)
+    public function update(Widget $widgetEntity)
     {
-        $ev = $widgetEntity->get(WidgetEntity::WIDGET_ID);
+        $ev = $widgetEntity->get(Widget::WIDGET_ID);
         if ($ev) {
-            $where = array(WidgetEntity::WIDGET_ID => $ev);
+            $where = array(Widget::WIDGET_ID => $ev);
         } else {
-            $ev = $widgetEntity->get(WidgetEntity::UID);
+            $ev = $widgetEntity->get(Widget::UID);
             if (!$ev) {
                 throw new \Exception('Entity Widget Must Contains "widget_id" or "uid" to update.');
             }
 
-            $where = array(WidgetEntity::UID => $ev);
+            $where = array(Widget::UID => $ev);
         }
 
         $this->getTableGateway()->update($widgetEntity->getArrayCopy(), $where);
@@ -101,12 +102,12 @@ class WidgetModel extends AbstractEventModel
     /**
      * Delete widget by entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @throws \Exception
      * @return mixed
      */
-    public function delete(WidgetEntity $widgetEntity)
+    public function delete(Widget $widgetEntity)
     {
         $where = $widgetEntity->getArrayCopy();
         foreach($where as $f => $v) {

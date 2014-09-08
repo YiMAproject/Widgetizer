@@ -1,7 +1,7 @@
 <?php
 namespace Widgetizer\Model;
 
-class WidgetEntity extends \Poirot\Dataset\Entity
+class Widget extends \Poirot\Dataset\Entity
 {
     const WIDGET_ID  = 'widget_id';  // Entity Storage ID
     const WIDGET     = 'widget';     // Widget Name

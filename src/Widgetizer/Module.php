@@ -63,7 +63,7 @@ class Module extends ParentalShare implements
         // on event manager or features on table gateway
         // this model service set with method with share by default as false value
         // on init module
-        $sm->setInvokableClass('Widgetizer.Model.Widget', 'Widgetizer\Model\WidgetModel', false);
+        $sm->setInvokableClass('Widgetizer.Model.Widget', 'Widgetizer\Model\Widget\Model', false);
     }
 
     /**
@@ -76,7 +76,7 @@ class Module extends ParentalShare implements
     {
         return array(
             'invokables' => array(
-                'Widgetizer.Model.ContainerWidgets' => 'Widgetizer\Model\ContainerWidgetsModel',
+                'Widgetizer.Model.ContainerWidgets' => 'Widgetizer\Model\Container\Model',
                 'Widgetizer.PersistStorage'         => 'Widgetizer\Service\PersistStorage',
             ),
         );

@@ -1,24 +1,22 @@
 <?php
-namespace Widgetizer\Model\TableGateway;
+namespace Widgetizer\Model\Container\TableGateway;
 
 use Poirot\Dataset;
-use Widgetizer\Model\ContainerWidgetsEntity;
+use Widgetizer\Model\Container;
 use yimaBase\Db\TableGateway\AbstractTableGateway;
-use yimaBase\Db\TableGateway\Feature\DmsFeature;
 use Zend\Db\ResultSet\ResultSet;
-use Widgetizer\Model\WidgetEntity;
 
-class ContainerWidgetsTable extends AbstractTableGateway
+class ContainerTable extends AbstractTableGateway
 {
 	# db table name
     protected $table = 'widgetizer_container_widgets';
 
 	// this way you speed up running by avoiding metadata call to reach primary key
 	// exp. usage in Translation Feature
-	protected $primaryKey = ContainerWidgetsEntity::CONTAINER_ID;
+	protected $primaryKey = Container::CONTAINER_ID;
 
     /**
-     * @var ContainerWidgetsEntity
+     * @var Container
      */
     protected $entityObject;
 
@@ -29,7 +27,7 @@ class ContainerWidgetsTable extends AbstractTableGateway
      */
     public function init()
     {
-        $entityObject       = new ContainerWidgetsEntity();
+        $entityObject       = new Container();
         $this->entityObject = $entityObject;
 
         // set default table columns on initialize, can used within features

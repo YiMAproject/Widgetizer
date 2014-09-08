@@ -1,9 +1,7 @@
 <?php
-namespace Widgetizer\Model\Interfaces;
+namespace Widgetizer\Model;
 
-use Widgetizer\Model\WidgetEntity;
-
-interface WidgetModelInterface
+interface WidgetInterface
 {
     /**
      * Get Widget Entity By UID
@@ -17,27 +15,27 @@ interface WidgetModelInterface
     /**
      * Insert new widget entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @return mixed
      */
-    public function insert(WidgetEntity $widgetEntity);
+    public function insert(Widget $widgetEntity);
 
     /**
      * Update an existing widget by entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @return mixed
      */
-    public function update(WidgetEntity $widgetEntity);
+    public function update(Widget $widgetEntity);
 
     /**
      * Delete widget by entity
      *
-     * @param WidgetEntity $widgetEntity
+     * @param Widget $widgetEntity
      *
      * @return mixed
      */
-    public function delete(WidgetEntity $widgetEntity);
+    public function delete(Widget $widgetEntity);
 }

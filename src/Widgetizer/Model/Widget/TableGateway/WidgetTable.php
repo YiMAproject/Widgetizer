@@ -1,11 +1,11 @@
 <?php
-namespace Widgetizer\Model\TableGateway;
+namespace Widgetizer\Model\Widget\TableGateway;
 
 use Poirot\Dataset;
+use Widgetizer\Model\Widget;
 use yimaBase\Db\TableGateway\AbstractTableGateway;
 use yimaBase\Db\TableGateway\Feature\DmsFeature;
 use Zend\Db\ResultSet\ResultSet;
-use Widgetizer\Model\WidgetEntity;
 
 class WidgetTable extends AbstractTableGateway
 {
@@ -14,10 +14,10 @@ class WidgetTable extends AbstractTableGateway
 
 	// this way you speed up running by avoiding metadata call to reach primary key
 	// exp. usage in Translation Feature
-	protected $primaryKey = WidgetEntity::WIDGET_ID;
+	protected $primaryKey = Widget::WIDGET_ID;
 
     /**
-     * @var WidgetEntity
+     * @var Widget
      */
     protected $entityObject;
 
@@ -28,7 +28,7 @@ class WidgetTable extends AbstractTableGateway
      */
     public function init()
     {
-        $entityObject       = new WidgetEntity();
+        $entityObject       = new Widget();
         $this->entityObject = $entityObject;
 
         // set default table columns on initialize, can used within features

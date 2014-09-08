@@ -1,7 +1,7 @@
 <?php
 namespace Widgetizer\Model;
 
-class ContainerWidgetsEntity extends \Poirot\Dataset\Entity
+class Container extends \Poirot\Dataset\Entity
 {
     const CONTAINER_ID      = 'container_id';      // table storage entity identifier (pk)
     const TEMPLATE          = 'template';          // template name
