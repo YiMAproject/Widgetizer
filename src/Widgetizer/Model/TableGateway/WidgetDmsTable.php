@@ -10,5 +10,5 @@ use yimaBase\Db\TableGateway\AbstractTableGateway;
 class WidgetDmsTable extends AbstractTableGateway
 {
     # db table name
-    protected $table = 'Widgetizer_widgets_dms';
+    protected $table = 'widgetizer_widgets_dms';
 }

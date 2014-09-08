@@ -1,5 +1,4 @@
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -16,11 +15,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `widgetizer_container_widgets` (
   `container_id` int(11) NOT NULL AUTO_INCREMENT,
-  `template` varchar(40) DEFAULT NULL,
-  `template_layout` varchar(40) DEFAULT NULL,
+  `template` varchar(40) NOT NULL DEFAULT '',
+  `template_layout` varchar(40) NOT NULL DEFAULT '',
   `template_area` varchar(40) NOT NULL,
-  `route_name` varchar(80) DEFAULT NULL,
-  `identifier_params` varchar(255) DEFAULT NULL COMMENT 'this identifier help to mix four up tables with other params, suggest path/scheme/params as identifier value',
+  `route_name` varchar(80) NOT NULL DEFAULT '',
+  `identifier_params` varchar(255) NOT NULL DEFAULT '' COMMENT 'this identifier help to mix four up tables with other params, suggest path/scheme/params as identifier value',
   `widget_uid` varchar(255) NOT NULL COMMENT 'identifier relation to widget table',
   `order` int(11) NOT NULL DEFAULT '5',
   PRIMARY KEY (`container_id`)
